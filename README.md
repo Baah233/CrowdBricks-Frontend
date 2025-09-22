@@ -1,15 +1,18 @@
-CrowdBricks Backend 🏗️
+ Frontend: `crowdbricks-frontend/README.md`
+
+```markdown
+# CrowdBricks Frontend 🌍
 
 CrowdBricks is a full-stack crowdfunding platform tailored for real estate projects.  
-This repository contains the **backend** built with Laravel and MySQL.
+This repository contains the **frontend** built with React (Vite) and TailwindCSS.
 
 ---
 
-Tech Stack
-- PHP 8+ / Laravel 11
-- MySQL (Laragon local)
-- Laravel Sanctum (API Authentication)
-- Swagger/OpenAPI (API Documentation)
+## 🚀 Tech Stack
+- React (Vite)
+- TailwindCSS
+- React Router
+- Axios (for API calls)
 
 ---
 
@@ -17,5 +20,5 @@ Tech Stack
 
 ### 1. Clone the repo
 ```bash
-git clone https://github.com/Baah233/crowdbricks-backend.git
-cd crowdbricks-backend
+git clone https://github.com/Baah233/crowdbricks-frontend.git
+cd crowdbricks-frontend
