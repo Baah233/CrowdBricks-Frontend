@@ -22,6 +22,8 @@ import {
 import { projects } from "@/lib/data";
 import { useToast } from "@/hooks/use-toast";
 import api from "../lib/api"; // ✅ make sure this points to your axios instance
+import { logout } from "@/utils/auth";
+
 
 const DeveloperDashboard = () => {
   const { toast } = useToast();

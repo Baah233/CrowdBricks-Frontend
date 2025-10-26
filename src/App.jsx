@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import AIChatToggle from "@/components/AIChatToggle"; // ✅ add this
 
 // Pages
 import Homepage from "@/pages/Homepage";
@@ -16,21 +17,26 @@ import DeveloperDashboard from "@/pages/DeveloperDashboard";
 import Login from "@/pages/Login";
 import Register from "@/pages/Register";
 import NotFound from "@/pages/NotFound";
-import About from "@/pages/About"; // 👈 newly added
+import About from "@/pages/About";
 import ProjectUploader from "@/pages/ProjectUploader";
+import Blog from "@/pages/Blog";
+import BlogDetails from "@/pages/BlogDetails";
+
 
 const queryClient = new QueryClient();
 
-// ✅ Reusable protected route wrapper
 const ProtectedRoute = ({ isAuthenticated, children }) => {
-  if (!isAuthenticated) {
-    return <Navigate to="/auth/login" replace />;
-  }
+  if (!isAuthenticated) return <Navigate to="/auth/login" replace />;
   return children;
 };
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) setIsAuthenticated(true);
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>
@@ -39,23 +45,24 @@ const App = () => {
         <Sonner />
         <BrowserRouter>
           <div className="min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
-            <Navbar />
+            <Navbar
+              isAuthenticated={isAuthenticated}
+              setIsAuthenticated={setIsAuthenticated}
+            />
             <main className="flex-1">
               <Routes>
-                {/* Public Routes */}
                 <Route path="/" element={<Homepage />} />
-                <Route path="/about" element={<About />} /> {/* 👈 About page */}
+                <Route path="/about" element={<About />} />
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/projects/:id" element={<ProjectDetails />} />
-                 <Route
-                    path="/auth/login"
-                    element={<Login setIsAuthenticated={setIsAuthenticated} />}
-                  />
-                  <Route path="/project-uploader" element={<ProjectUploader />} />
-
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogDetails />} />  
+                <Route
+                  path="/auth/login"
+                  element={<Login setIsAuthenticated={setIsAuthenticated} />}
+                />
+                <Route path="/project-uploader" element={<ProjectUploader />} />
                 <Route path="/auth/register" element={<Register />} />
-
-                {/* Protected Routes */}
                 <Route
                   path="/dashboard/investor"
                   element={
@@ -72,12 +79,11 @@ const App = () => {
                     </ProtectedRoute>
                   }
                 />
-
-                {/* Fallback Route */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
             <Footer />
+            <AIChatToggle /> {/* ✅ this makes the chat button appear */}
           </div>
         </BrowserRouter>
       </TooltipProvider>
