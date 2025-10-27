@@ -5,10 +5,7 @@ import { Button } from "@/components/ui/button";
 import { MapPin, Users, TrendingUp, CheckCircle } from "lucide-react";
 import { ProgressBar } from "@/components/ProgressBar";
 
-
-
-
-export const ProjectCard = ({ project, featured = false }) => {
+const ProjectCard = ({ project, featured = false }) => {
   const fundingPercentage = (project.currentFunding / project.targetFunding) * 100;
   const formatCurrency = (amount) => `₵${amount.toLocaleString()}`;
 
@@ -119,3 +116,5 @@ export const ProjectCard = ({ project, featured = false }) => {
     </Card>
   );
 };
+
+export default ProjectCard;

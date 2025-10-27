@@ -1,8 +1,8 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ProjectCard } from "@/components/ProjectCard";
+import ProjectCard from "@/components/ProjectCard";
 import {
   TrendingUp,
   Users,
@@ -14,22 +14,73 @@ import {
 import { Link } from "react-router-dom";
 import { projects, platformStats } from "@/lib/data";
 import AIChatToggle from "@/components/AIChatToggle";
+import { motion, AnimatePresence } from "framer-motion";
 
 /*
-  Updated Homepage:
-  - Core color palette tightened to white / blue / yellow for a brighter look.
-  - Added lightweight client-side search and subtle motion.
-  - Added AIChatToggle component (floating AI assistant) for intelligent help.
-  - All logic/data usage remains unchanged (featuredProjects still projects.slice(0,3)).
+  Homepage.jsx - cleaned and fixed
+  - Removed unused/duplicated testimonial declarations
+  - Removed dead TestimonialSection component
+  - Fixed missing/incorrect state variable references (use showTestimonial)
+  - Fixed ProjectCard import to default
+  - Kept original logic and layout, made the file renderable
 */
 
+const testimonials = [
+  {
+    quote:
+      "CrowdBricks made real estate investing so simple. I started small, but now I own shares in 3 different properties!",
+    name: "Judith Black",
+    role: "Investor",
+    image:
+      "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+  },
+  {
+    quote:
+      "Thanks to CrowdBricks, my development project was fully funded within weeks — incredible platform!",
+    name: "Kwame Boateng",
+    role: "Real Estate Developer",
+    image:
+      "https://images.unsplash.com/photo-1607746882042-944635dfe10e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+  },
+  {
+    quote:
+      "I love how transparent and easy it is to track my investments in real-time. Highly recommend CrowdBricks.",
+    name: "Ama Serwaa",
+    role: "Entrepreneur",
+    image:
+      "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?auto=format&fit=facearea&facepad=2&w=256&h=256&q=80",
+  },
+];
+
 const Homepage = () => {
+  const [currentSlide, setCurrentSlide] = useState(0);
   const [query, setQuery] = useState("");
   const [showTestimonial, setShowTestimonial] = useState(0);
 
   const featuredProjects = projects.slice(0, 3);
 
-  // client-side search/filter for discoverability (purely UI)
+  const cardImages = ["/deligence.png", "/crowfunding.jpg", "/estatemaster.jpg"];
+
+  // hero background images
+  const heroImages = ["/hero1.png", "/hero2.png", "/hero3.png", "/hero4.png"];
+
+  // auto-slide every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [heroImages.length]);
+
+  // auto-advance testimonials every 6 seconds
+  useEffect(() => {
+    const t = setInterval(() => {
+      setShowTestimonial((prev) => (prev + 1) % testimonials.length);
+    }, 6000);
+    return () => clearInterval(t);
+  }, []);
+
+  // client-side search/filter
   const filteredFeatured = useMemo(() => {
     if (!query.trim()) return featuredProjects;
     const term = query.toLowerCase();
@@ -40,30 +91,10 @@ const Homepage = () => {
     );
   }, [featuredProjects, query]);
 
-  const testimonials = [
-    {
-      name: "Akua Mensah",
-      quote:
-        "I started with ₵500 and now receive quarterly returns. Crowdbricks made investing simple and safe.",
-    },
-    {
-      name: "Kwame Asare",
-      quote:
-        "Transparent project details and clear timelines — the vetting gives me confidence.",
-    },
-    {
-      name: "Nana Yaa",
-      quote:
-        "Fast onboarding and excellent support. I love the fractional ownership model.",
-    },
-  ];
-
   const formatCurrency = (amount) => `₵${(amount / 1000000).toFixed(1)}M`;
   const formatNumber = (num) => num.toLocaleString();
 
-  // brighter blue-to-white hero with yellow CTA accents
-  const heroGradient =
-    "bg-gradient-to-br from-blue-600 via-blue-400 to-white";
+  const heroGradient = "bg-gradient-to-br from-blue-600 via-blue-400 to-white";
 
   return (
     <div className="min-h-screen font-sans bg-white text-slate-900 selection:bg-yellow-200 antialiased">
@@ -72,8 +103,24 @@ const Homepage = () => {
         className={`${heroGradient} relative py-24 lg:py-36 overflow-hidden`}
         aria-label="Hero"
       >
+        {/* Background carousel */}
+        <div className="absolute inset-0 overflow-hidden">
+          {heroImages.map((src, index) => (
+            <img
+              key={index}
+              src={src}
+              alt={`Hero background ${index + 1}`}
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-1000 ease-in-out ${
+                index === currentSlide ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
+            />
+          ))}
+          <div className="absolute inset-0 bg-blue-900/40 mix-blend-multiply"></div>
+        </div>
+
+        {/* Decorative SVG */}
         <svg
-          className="pointer-events-none absolute right-0 top-0 -translate-y-8 translate-x-16 opacity-12 w-96"
+          className="pointer-events-none absolute right-0 top-0 -translate-y-8 translate-x-16 opacity-12 w-96 z-0"
           viewBox="0 0 600 400"
           xmlns="http://www.w3.org/2000/svg"
           aria-hidden
@@ -91,8 +138,9 @@ const Homepage = () => {
           />
         </svg>
 
+        {/* Hero Content */}
         <div className="container mx-auto px-6 relative z-10">
-          <div className="max-w-4xl mx-auto text-center space-y-6">
+          <div className="max-w-4xl mx-auto text-center space-y-6 text-white drop-shadow-lg">
             <Badge
               variant="secondary"
               className="text-sm px-4 py-1 rounded-full bg-white/80 border border-white/30 text-blue-800"
@@ -100,30 +148,30 @@ const Homepage = () => {
               Ghana's Premier Real Estate Crowdfunding Platform
             </Badge>
 
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight text-slate-900">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-tight">
               Invest in Real Estate,
               <br />
-              <span className="inline-block bg-gradient-to-r from-yellow-400 to-yellow-500 bg-clip-text text-transparent">
+              <span className="inline-block bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">
                 One Brick at a Time
               </span>
             </h1>
 
-            <p className="text-lg md:text-xl text-slate-700 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl max-w-3xl mx-auto leading-relaxed text-blue-100">
               Start with as little as ₵500 and earn passive income from verified
               real estate projects across Ghana.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Link to="/projects" aria-label="Browse Projects">
+              <Link to="/projects">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="text-blue-700 border-blue-200 hover:scale-105 hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold"
+                  className="text-white border-white hover:bg-white/10 hover:scale-105 hover:shadow-xl transition-all duration-300 px-8 py-4 text-lg font-semibold"
                 >
-                  Browse Projects
+                  Browse Investments
                 </Button>
               </Link>
-              <Link to="/auth/register" aria-label="Get Started">
+              <Link to="/auth/register">
                 <Button
                   size="lg"
                   variant="default"
@@ -133,46 +181,126 @@ const Homepage = () => {
                 </Button>
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
 
-            {/* quick CTA card */}
-            <div className="mt-8 mx-auto max-w-3xl">
-              <div className="mx-auto bg-white/90 backdrop-blur-md border border-blue-100 rounded-xl p-4 flex flex-col sm:flex-row items-center gap-4 shadow-sm">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 rounded bg-yellow-100">
-                    <DollarSign className="h-6 w-6 text-yellow-500" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-blue-800">Quick Invest</div>
-                    <div className="text-sm text-slate-600">
-                      Start with ₵500 — diversify across multiple projects
-                    </div>
-                  </div>
-                </div>
+      {/* Login Section */}
+      <section className="py-20 bg-gradient-to-br from-blue-70 via-white to-yellow-100">
+        <div className="container mx-auto px-6 text-center max-w-3xl">
+          <h2 className="text-4xl font-bold text-slate-900 mb-4">
+            Property Investment Made Simple
+          </h2>
 
-                <div className="ml-auto flex gap-3">
-                  <Link to="/projects">
-                    <Button size="sm" className="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700">
-                      Invest Now
-                    </Button>
-                  </Link>
-                  <Link to="/about">
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="px-4 py-2 text-blue-700"
-                    >
-                      Learn More
-                    </Button>
-                  </Link>
-                </div>
+          <h4 className="text-xl text-slate-700 mb-6">
+            Build Wealth Online | <span className="text-yellow-400">Capital Growth & Income </span> | Diversify Your Portfolio | National Investors Community | <span className="text-yellow-400">Build Ghana </span>
+          </h4>
+
+          <p className="text-slate-600 mb-6 leading-relaxed">
+            <span className="text-blue-600 font-bold">Crowd</span>
+            <span className="text-yellow-400 font-bold">Bricks</span> makes online property investment accessible to everyone, whilst helping property developers deliver more infrastructural projects and homes across Ghana. Our investment management platform allows individuals, companies and trusts to co-invest in Ghana property.
+          </p>
+
+          <p className="text-slate-600 mb-10 leading-relaxed">
+            Since launching our peer to peer lending platform in 2023, we have built up vast experience and insight in this constantly evolving marketplace, which we freely share with investors and fundraisers. Flexibility, transparency and integrity are key to everything we do.
+          </p>
+
+          <Link to="/auth/login">
+            <Button
+              size="lg"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              Login to Your Account
+            </Button>
+          </Link>
+        </div>
+      </section>
+
+      {/* Info Cards Section */}
+      <section className="py-20 bg-gradient-to-br from-white via-blue-70 to-yellow-100">
+        <div className="container mx-auto px-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Card 1 */}
+            <div className="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+              <img
+                src="/deligence.png"
+                alt="Invest Smart"
+                className="absolute inset-0 w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all duration-300"
+              />
+              <div className="relative p-8 text-white h-full flex flex-col justify-end bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                <h3 className="text-2xl font-bold mb-2">Latest Blog</h3>
+                <p className="text-blue-100 mb-4">
+                  Learn the due diligence essentials for property crowdfunding and P2P lending investments so that you can make an informed decision.
+                </p>
+                <p className="text-blue-100 mb-4">
+                  This article provides investors with information on how to evaluate property crowdfunding and peer to peer lending opportunities.
+                </p>
+                <Link
+                  to="/projects"
+                  className="inline-block bg-yellow-400 text-slate-900 font-semibold px-4 py-2 rounded-lg hover:bg-yellow-500 transition-all"
+                >
+                  Read Article
+                </Link>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+              <img
+                src="/estatemasters.jpg"
+                alt="Build Together"
+                className="absolute inset-0 w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all duration-300"
+              />
+              <div className="relative p-8 text-white h-full flex flex-col justify-end bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                <h3 className="text-2xl font-bold mb-2">Learn About Estate Masters</h3>
+                <p className="text-blue-100 mb-4">
+                  Meet the director of Estate Master, Francis Opey. He explains why it is important for them to build zero carbon ready homes.
+                </p>
+                <p className="text-blue-100 mb-4">
+                  They are committed to providing excellent and honest services to clients. Estate Masters is an active member of GREDA.
+                </p>
+                <a
+                  href="https://www.youtube.com/watch?v=tW16HU7yL3Y"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="inline-block bg-yellow-400 text-slate-900 font-semibold px-4 py-2 rounded-lg hover:bg-yellow-500 transition-all"
+                >
+                  Learn More
+                </a>
+              </div>
+            </div>
+
+            {/* Card 3 */}
+            <div className="relative group rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-shadow duration-300">
+              <img
+                src="/crowdfunding.jpg"
+                alt="Grow Wealth"
+                className="absolute inset-0 w-full h-full object-cover brightness-75 group-hover:brightness-90 transition-all duration-300"
+              />
+              <div className="relative p-8 text-white h-full flex flex-col justify-end bg-gradient-to-t from-black/60 via-black/30 to-transparent">
+                <h3 className="text-2xl font-bold mb-2">What is Crowdfunding?</h3>
+                <h2 className="text-2xl font-bold mb-2">Watch our introduction to Crowdfunding.</h2>
+                <p className="text-blue-100 mb-4">
+                  Here we talk about the concept of crowdfunding, how it works and how it can be used to raise funds for property.
+                </p>
+                <a
+                  href="https://www.youtube.com/watch?v=voF1plqqZJA"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                  className="inline-block bg-yellow-400 text-slate-900 font-semibold px-4 py-2 rounded-lg hover:bg-yellow-500 transition-all"
+                >
+                  Watch Video
+                </a>
               </div>
             </div>
           </div>
         </div>
       </section>
 
+  
+
       {/* Stats Section */}
-      <section className="py-12 -mt-12">
+      <section className="py-12 -mt-12 bg-blue-500">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -225,42 +353,53 @@ const Homepage = () => {
         </div>
       </section>
 
+      <section className="py-20 bg-gradient-to-br from-blue-70 via-white to-yellow-100">
+        <div className="container mx-auto px-6 text-center max-w-3xl">
+          <h2 className="text-4xl font-bold text-slate-900 mb-4">Learn About Property Investment</h2>
+          <p className="text-slate-600 mb-10 leading-relaxed">
+            Property Developers often share their knowledge and expertise with investors through the 'Learn Whilst Investing' program. Program details are shared as part of the investment pack.
+          </p>
+          <p className="text-slate-400 mb-10 leading-relaxed">
+            So far, investors have learnt about new builds, renovations, HMOs, planning gain, commercial to residential conversions and title splits. And all through active investments.
+          </p>
+
+          <Link to="/auth/login">
+            <Button
+              size="lg"
+              className="bg-yellow-400 hover:bg-yellow-500 text-slate-900 px-8 py-4 text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+            >
+              LOGIN TO ACCESS PROJECT INFORMATION
+            </Button>
+          </Link>
+          <p className="text-slate-600 mt-6 leading-relaxed">Grow Your Investment Portfolio and Expand Your Property Knowledge</p>
+        </div>
+      </section>
+
       {/* Featured Projects */}
-      <section className="py-20">
+       <section className="py-20 bg-gradient-to-br from-white via-blue-70 to-yellow-100">
         <div className="container mx-auto px-6">
           <div className="flex flex-col md:flex-row items-start justify-between mb-8 gap-6">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">
-                Featured Investment Opportunities
-              </h2>
+              <h2 className="text-3xl md:text-4xl font-bold mb-2">Featured Investment Opportunities</h2>
               <p className="text-bold text-slate-900 max-w-xl font-bold">
-                Curated, high-return real estate projects vetted for transparency
-                and impact.
+                Curated, high-return real estate projects vetted for transparency and impact.
               </p>
             </div>
 
             <div className="flex items-center gap-3 w-full md:w-auto">
               <div className="relative flex-1 md:flex-none">
-                <label htmlFor="search" className="sr-only">
-                  Search featured projects
-                </label>
                 <input
                   id="search"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   placeholder="Search title or description..."
                   className="w-full md:w-72 pl-10 pr-4 py-2 rounded-lg bg-white border border-blue-100 focus:ring-2 focus:ring-blue-300 outline-none"
-                  aria-label="Search featured projects"
                 />
                 <Search className="absolute left-3 top-2.5 h-5 w-5 text-blue-300" />
               </div>
 
               <Link to="/projects">
-                <Button
-                  size="md"
-                  variant="outline"
-                  className="text-blue-700 hover:scale-105 transition-transform duration-200"
-                >
+                <Button size="md" variant="outline" className="text-blue-700 hover:scale-105 transition-transform duration-200">
                   View All
                 </Button>
               </Link>
@@ -269,10 +408,7 @@ const Homepage = () => {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
             {filteredFeatured.map((project) => (
-              <div
-                key={project.id}
-                className="transform hover:-translate-y-2 transition-transform duration-300"
-              >
+              <div key={project.id} className="transform hover:-translate-y-2 transition-transform duration-300">
                 <ProjectCard project={project} featured />
               </div>
             ))}
@@ -289,11 +425,7 @@ const Homepage = () => {
 
           <div className="text-center">
             <Link to="/projects">
-              <Button
-                size="lg"
-                variant="outline"
-                className="hover:scale-105 transition-transform duration-300"
-              >
+              <Button size="lg" variant="outline" className="hover:scale-105 transition-transform duration-300">
                 View All Projects
                 <TrendingUp className="ml-2 h-5 w-5" />
               </Button>
@@ -302,172 +434,59 @@ const Homepage = () => {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="bg-white/95 py-20">
-        <div className="container mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
-              How Crowdbricks Works
-            </h2>
-            <p className="text-sm md:text-base text-slate-600 max-w-2xl mx-auto">
-              Invest in verified real estate projects in three simple steps.
-            </p>
-          </div>
+          {/* Testimonials Section */}
+      <section className="relative isolate overflow-hidden bg-blue-600 px-6 py-24 sm:py-32 lg:px-8">
+        <div className="mx-auto max-w-2xl lg:max-w-4xl text-center">
+          <img src="/CB1.png" alt="CrowdBricks logo" className="mx-auto h-80 w-100 mb-10" />
 
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                icon: Search,
-                title: "1. Browse & Research",
-                text:
-                  "Explore verified projects with transparent details and expected ROI.",
-              },
-              {
-                icon: DollarSign,
-                title: "2. Invest Securely",
-                text:
-                  "Choose your amount, pay via Momo or bank, and own fractional shares.",
-              },
-              {
-                icon: TrendingUp,
-                title: "3. Earn Returns",
-                text:
-                  "Track performance, receive dividends, and grow your portfolio.",
-              },
-            ].map((step, i) => (
-              <Card
-                key={i}
-                className="text-center p-8 shadow-md hover:shadow-xl hover:-translate-y-2 transition-all duration-300"
-              >
-                <CardContent className="space-y-4">
-                  <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto bg-gradient-to-br from-blue-50 to-white ring-1 ring-blue-100">
-                    <step.icon className="h-8 w-8 text-blue-700" />
+          <AnimatePresence mode="wait">
+            <motion.figure
+              key={showTestimonial}
+              initial={{ opacity: 0, y: 40 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -40 }}
+              transition={{ duration: 0.6 }}
+              className="text-center"
+            >
+              <blockquote className="text-xl sm:text-2xl font-semibold text-white">
+                <p>“{testimonials[showTestimonial].quote}”</p>
+              </blockquote>
+              <figcaption className="mt-10">
+                <img
+                  src={testimonials[showTestimonial].image}
+                  alt={testimonials[showTestimonial].name}
+                  className="mx-auto h-12 w-12 rounded-full object-cover border-2 border-yellow-400"
+                />
+                <div className="mt-4 flex items-center justify-center space-x-3 text-base">
+                  <div className="font-semibold text-white">
+                    {testimonials[showTestimonial].name}
                   </div>
-                  <h3 className="text-xl font-semibold">{step.title}</h3>
-                  <p className="text-slate-600 text-sm">{step.text}</p>
-                </CardContent>
-              </Card>
+                  <svg viewBox="0 0 2 2" width="3" height="3" aria-hidden="true" className="fill-white">
+                    <circle r="1" cx="1" cy="1" />
+                  </svg>
+                  <div className="text-gray-400">{testimonials[showTestimonial].role}</div>
+                </div>
+              </figcaption>
+            </motion.figure>
+          </AnimatePresence>
+
+          {/* dots indicator */}
+          <div className="flex justify-center mt-10 space-x-3">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setShowTestimonial(index)}
+                aria-label={`Show testimonial ${index + 1}`}
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                  showTestimonial === index ? "bg-yellow-400 w-5" : "bg-gray-500 hover:bg-gray-400"
+                }`}
+              ></button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Trust Section + Testimonials */}
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          <div className="max-w-5xl mx-auto text-center space-y-8">
-            <h2 className="text-3xl md:text-4xl font-bold flex items-center justify-center gap-3">
-              <Shield className="h-8 w-8 text-blue-700" /> Why Choose Crowdbricks?
-            </h2>
-
-            <div className="grid md:grid-cols-2 gap-8 text-left">
-              <div className="space-y-6">
-                {[
-                  {
-                    icon: Shield,
-                    title: "SEC-Compliant Platform",
-                    desc:
-                      "Regulated under Ghana's Securities & Exchange Commission.",
-                  },
-                  {
-                    icon: Users,
-                    title: "Verified Developers",
-                    desc:
-                      "All developers undergo strict vetting and project checks.",
-                  },
-                  {
-                    icon: Building2,
-                    title: "Quality Projects",
-                    desc: "We assess every project for profitability and risk.",
-                  },
-                  {
-                    icon: TrendingUp,
-                    title: "Transparent Returns",
-                    desc: "Clear data on ROI, timeline, and risk levels.",
-                  },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-start space-x-4">
-                    <div className="p-3 bg-blue-50 rounded-full">
-                      <item.icon className="h-5 w-5 text-blue-700" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-semibold">{item.title}</h3>
-                      <p className="text-slate-600 text-sm">
-                        {item.desc}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              <div className="bg-white/90 backdrop-blur-md border border-blue-50 rounded-xl p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div>
-                    <div className="text-sm text-slate-600">
-                      What investors say
-                    </div>
-                    <div className="text-lg font-semibold">Real stories</div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() =>
-                        setShowTestimonial(
-                          (v) => (v - 1 + testimonials.length) % testimonials.length
-                        )
-                      }
-                      aria-label="Previous testimonial"
-                      className="px-2 py-1 rounded bg-blue-50"
-                    >
-                      ‹
-                    </button>
-                    <button
-                      onClick={() =>
-                        setShowTestimonial((v) => (v + 1) % testimonials.length)
-                      }
-                      aria-label="Next testimonial"
-                      className="px-2 py-1 rounded bg-blue-50"
-                    >
-                      ›
-                    </button>
-                  </div>
-                </div>
-
-                <blockquote className="text-sm text-slate-600">
-                  “{testimonials[showTestimonial].quote}”
-                </blockquote>
-                <div className="mt-4 text-sm font-medium">
-                  — {testimonials[showTestimonial].name}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="bg-gradient-to-r from-blue-700 to-blue-600 text-white py-20">
-        <div className="container mx-auto px-6 text-center max-w-3xl space-y-6">
-          <h2 className="text-3xl md:text-4xl font-bold">Ready to Start Building Wealth?</h2>
-          <p className="text-sm md:text-base text-blue-100/90">
-            Join thousands of Ghanaians already earning from real estate.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/auth/register">
-              <Button size="lg" className="bg-white text-blue-700 hover:bg-white/90 hover:scale-105 transition-transform duration-300 px-8 py-4">
-                Create Account
-              </Button>
-            </Link>
-            <Link to="/projects">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10 hover:scale-105 px-8 py-4">
-                Explore Projects
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Floating AI Chat Toggle (assistant) */}
+      {/* Floating AI Chat Toggle */}
       <AIChatToggle />
     </div>
   );

@@ -21,6 +21,9 @@ import About from "@/pages/About";
 import ProjectUploader from "@/pages/ProjectUploader";
 import Blog from "@/pages/Blog";
 import BlogDetails from "@/pages/BlogDetails";
+import Raise from "@/pages/Raise";
+import News from "@/pages/News";
+import Resources from "@/pages/Resources";
 
 
 const queryClient = new QueryClient();
@@ -56,7 +59,11 @@ const App = () => {
                 <Route path="/projects" element={<Projects />} />
                 <Route path="/projects/:id" element={<ProjectDetails />} />
                 <Route path="/blog" element={<Blog />} />
-                <Route path="/blog/:slug" element={<BlogDetails />} />  
+                <Route path="/blog/:slug" element={<BlogDetails />} /> 
+                <Route path="/raise" element={<Raise />} />
+                <Route path="/news" element={<News />} /> 
+                <Route path="/resources" element={<Resources />} />
+
                 <Route
                   path="/auth/login"
                   element={<Login setIsAuthenticated={setIsAuthenticated} />}
