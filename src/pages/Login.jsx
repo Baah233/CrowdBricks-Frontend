@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,20 +7,23 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Eye, EyeOff } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import api from "@/lib/api"; // ✅ centralized axios instance
+import api from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { toast } = useToast();
+  const { setUser, setToken, setUserType } = useAuth();
 
+  const redirectTo = new URLSearchParams(location.search).get("redirect");
   const [showPassword, setShowPassword] = useState(false);
-  const [userType, setUserType] = useState("investor");
+  const [userTypeTab, setUserTypeTab] = useState("investor");
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     ghanaCard: "",
-    user_type: "",
   });
 
   const handleInputChange = (field, value) => {
@@ -44,27 +47,42 @@ const Login = ({ setIsAuthenticated }) => {
         email: formData.email,
         password: formData.password,
         ghana_card: formData.ghanaCard || null,
-        user_type: userType,
+        user_type: userTypeTab,
       });
 
-      const { user, token, message } = response.data;
+      // Backend returns: { success, message, data: { token, user } }
+      const { user, token } = response.data.data;
+      const message = response.data.message;
+
+      // ✅ Store globally
+      setUser(user);
+      setToken(token);
+      setUserType(user.user_type || userTypeTab);
+
+      // ✅ Save to localStorage (for reload persistence)
+      localStorage.setItem("token", token);
+      localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userType", user.user_type || userTypeTab);
+
+      // ✅ Set default header for future API requests
+      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       toast({
         title: "Login Successful 🎉",
-        description: message || `Welcome back, ${user.name}!`,
+        description: message || `Welcome back, ${user.first_name || user.name}!`,
       });
 
-      localStorage.setItem("token", token);
-      localStorage.setItem("userType", userType);
-      localStorage.setItem("user", JSON.stringify(user));
-      setIsAuthenticated(true);
-
+      // ✅ Redirect logic
       setTimeout(() => {
-        navigate(
-          userType === "investor"
-            ? "/dashboard/investor"
-            : "/dashboard/developer"
-        );
+        const role = user.user_type || userTypeTab;
+
+        if (redirectTo) {
+          navigate(redirectTo);
+        } else if (role === "developer") {
+          navigate("/dashboard/developer");
+        } else {
+          navigate("/dashboard/investor");
+        }
       }, 800);
     } catch (error) {
       console.error("Login error:", error);
@@ -88,7 +106,7 @@ const Login = ({ setIsAuthenticated }) => {
     <section>
       <div className="min-h-screen bg-white flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          {/* ✅ Top logo area */}
+          {/* ✅ Logo & heading */}
           <div className="flex flex-col items-center mb-6">
             <Link to="/" className="flex flex-col items-center group cursor-pointer">
               <img
@@ -112,17 +130,15 @@ const Login = ({ setIsAuthenticated }) => {
 
           <Card className="shadow-soft-lg border border-slate-100 bg-blue/80 backdrop-blur-md">
             <CardHeader className="bg-blue/50">
-              <CardTitle className="text-center text-lg md:text-xl">
-                <span className="text-slate-800 font-semibold">
-                  Login to your account
-                </span>
+              <CardTitle className="text-center text-lg md:text-xl text-slate-800 font-semibold">
+                Login to your account
               </CardTitle>
             </CardHeader>
 
             <CardContent>
               <Tabs
-                value={userType}
-                onValueChange={(value) => setUserType(value)}
+                value={userTypeTab}
+                onValueChange={(v) => setUserTypeTab(v)}
                 className="space-y-6"
               >
                 {/* User Type Selector */}
@@ -130,7 +146,7 @@ const Login = ({ setIsAuthenticated }) => {
                   <TabsTrigger
                     value="investor"
                     className={`${
-                      userType === "investor"
+                      userTypeTab === "investor"
                         ? "bg-blue-600 shadow-sm text-white"
                         : "text-slate-700"
                     } rounded-md`}
@@ -140,7 +156,7 @@ const Login = ({ setIsAuthenticated }) => {
                   <TabsTrigger
                     value="developer"
                     className={`${
-                      userType === "developer"
+                      userTypeTab === "developer"
                         ? "bg-blue-600 shadow-sm text-white"
                         : "text-slate-700"
                     } rounded-md`}
@@ -149,57 +165,41 @@ const Login = ({ setIsAuthenticated }) => {
                   </TabsTrigger>
                 </TabsList>
 
-                {/* Investor Form */}
-                <TabsContent value="investor" className="space-y-4">
+                <TabsContent value={userTypeTab} className="space-y-4">
                   <div className="space-y-4">
                     <div>
-                      <Label
-                        htmlFor="investor-email"
-                        className="block text-sm font-semibold text-slate-800 mb-1"
-                      >
+                      <Label htmlFor="email" className="text-sm font-semibold text-slate-800 mb-1 block">
                         Email Address
                       </Label>
                       <Input
-                        id="investor-email"
+                        id="email"
                         type="email"
                         placeholder="Enter your email"
                         value={formData.email}
-                        onChange={(e) =>
-                          handleInputChange("email", e.target.value)
-                        }
-                        className="mt-1 pr-12 bg-blue-50 text-slate-900 placeholder-slate-500 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
+                        onChange={(e) => handleInputChange("email", e.target.value)}
+                        className="bg-blue-50 text-slate-900 border border-slate-300 focus:ring-2 focus:ring-blue-500 rounded-md"
                       />
                     </div>
 
                     <div>
-                      <Label
-                        htmlFor="investor-password"
-                        className="block text-sm font-semibold text-slate-800 mb-1"
-                      >
+                      <Label htmlFor="password" className="text-sm font-semibold text-slate-800 mb-1 block">
                         Password
                       </Label>
-
                       <div className="relative">
                         <Input
-                          id="investor-password"
+                          id="password"
                           type={showPassword ? "text" : "password"}
                           placeholder="Enter your password"
                           value={formData.password}
-                          onChange={(e) =>
-                            handleInputChange("password", e.target.value)
-                          }
-                          className="mt-1 pr-12 bg-blue-50 text-slate-900 placeholder-slate-500 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
+                          onChange={(e) => handleInputChange("password", e.target.value)}
+                          className="bg-blue-50 text-slate-900 border border-slate-300 focus:ring-2 focus:ring-blue-500 rounded-md"
                         />
-
                         <Button
                           type="button"
                           variant="ghost"
                           size="icon"
                           className="absolute right-1 top-1 h-9 px-2"
                           onClick={() => setShowPassword(!showPassword)}
-                          aria-label={
-                            showPassword ? "Hide password" : "Show password"
-                          }
                         >
                           {showPassword ? (
                             <EyeOff className="h-4 w-4 text-slate-600" />
@@ -210,107 +210,26 @@ const Login = ({ setIsAuthenticated }) => {
                       </div>
                     </div>
 
-                    <div>
-                      <Label
-                        htmlFor="investor-ghana-card"
-                        className="block text-sm font-semibold text-slate-800 mb-1"
-                      >
-                        Ghana Card Number (Optional)
-                      </Label>
-                      <Input
-                        id="investor-ghana-card"
-                        placeholder="GHA-123456789-1"
-                        value={formData.ghanaCard}
-                        onChange={(e) =>
-                          handleInputChange("ghanaCard", e.target.value)
-                        }
-                        className="mt-1 pr-12 bg-blue-50 text-slate-900 placeholder-slate-500 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
-                      />
-                    </div>
-                  </div>
-                </TabsContent>
-
-                {/* Developer Form */}
-                <TabsContent value="developer" className="space-y-4">
-                  <div className="space-y-4">
-                    <div>
-                      <Label
-                        htmlFor="developer-email"
-                        className="block text-sm font-semibold text-slate-800 mb-1"
-                      >
-                        Email Address
-                      </Label>
-                      <Input
-                        id="developer-email"
-                        type="email"
-                        placeholder="Enter your email"
-                        value={formData.email}
-                        onChange={(e) =>
-                          handleInputChange("email", e.target.value)
-                        }
-                        className="mt-1 pr-12 bg-blue-50 text-slate-900 placeholder-slate-500 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
-                      />
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="developer-password"
-                        className="block text-sm font-semibold text-slate-800 mb-1"
-                      >
-                        Password
-                      </Label>
-                      <div className="relative">
-                        <Input
-                          id="developer-password"
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Enter your password"
-                          value={formData.password}
-                          onChange={(e) =>
-                            handleInputChange("password", e.target.value)
-                          }
-                          className="mt-1 pr-12 bg-blue-50 text-slate-900 placeholder-slate-500 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
-                        />
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          className="absolute right-1 top-1 h-9 px-2"
-                          onClick={() => setShowPassword(!showPassword)}
-                          aria-label={
-                            showPassword ? "Hide password" : "Show password"
-                          }
+                    {userTypeTab === "developer" && (
+                      <div>
+                        <Label
+                          htmlFor="ghanaCard"
+                          className="text-sm font-semibold text-slate-800 mb-1 block"
                         >
-                          {showPassword ? (
-                            <EyeOff className="h-4 w-4 text-slate-600" />
-                          ) : (
-                            <Eye className="h-4 w-4 text-slate-600" />
-                          )}
-                        </Button>
+                          Ghana Card Number (Required)
+                        </Label>
+                        <Input
+                          id="ghanaCard"
+                          placeholder="GHA-123456789-1"
+                          value={formData.ghanaCard}
+                          onChange={(e) => handleInputChange("ghanaCard", e.target.value)}
+                          className="bg-blue-50 text-slate-900 border border-slate-300 focus:ring-2 focus:ring-blue-500 rounded-md"
+                        />
                       </div>
-                    </div>
-
-                    <div>
-                      <Label
-                        htmlFor="developer-ghana-card"
-                        className="block text-sm font-semibold text-slate-800 mb-1"
-                      >
-                        Ghana Card Number (Required)
-                      </Label>
-                      <Input
-                        id="developer-ghana-card"
-                        placeholder="GHA-123456789-1"
-                        value={formData.ghanaCard}
-                        onChange={(e) =>
-                          handleInputChange("ghanaCard", e.target.value)
-                        }
-                        required
-                        className="mt-1 pr-12 bg-blue-50 text-slate-900 placeholder-slate-500 border border-slate-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 rounded-md"
-                      />
-                    </div>
+                    )}
                   </div>
                 </TabsContent>
 
-                {/* Login Button */}
                 <Button
                   onClick={handleLogin}
                   className="w-full bg-blue-600 hover:bg-blue-500 text-white"
@@ -319,56 +238,20 @@ const Login = ({ setIsAuthenticated }) => {
                 >
                   {loading
                     ? "Signing In..."
-                    : `Sign In as ${
-                        userType === "investor" ? "Investor" : "Developer"
-                      }`}
+                    : `Sign In as ${userTypeTab === "investor" ? "Investor" : "Developer"}`}
                 </Button>
 
-                {/* Extra Links */}
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <Link
-                      to="/forgot-password"
-                      className="text-sm text-blue-600 hover:underline font-semibold"
-                    >
-                      Forgot your password?
-                    </Link>
-                  </div>
-
-                  <div className="relative">
-                    <div
-                      className="absolute inset-0 flex items-center"
-                      aria-hidden
-                    >
-                      <span className="w-full border-t border-slate-200" />
-                    </div>
-                    <div className="relative flex justify-center text-xs uppercase">
-                      <span className="bg-white px-2 text-slate-500">
-                        Or continue with
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <Button
-                      variant="outline"
-                      className="border-slate-200 text-slate-700"
-                    >
-                      📱 Mobile Money
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="border-slate-200 text-slate-700"
-                    >
-                      🏦 Bank Account
-                    </Button>
-                  </div>
+                <div className="text-center mt-4">
+                  <Link
+                    to="/forgot-password"
+                    className="text-sm text-blue-600 hover:underline font-semibold"
+                  >
+                    Forgot your password?
+                  </Link>
                 </div>
 
-                <div className="text-center text-sm">
-                  <span className="text-slate-700">
-                    Don’t have an account?{" "}
-                  </span>
+                <div className="text-center text-sm mt-4">
+                  <span className="text-slate-700">Don’t have an account? </span>
                   <Link
                     to="/auth/register"
                     className="text-blue-600 hover:underline font-medium"
@@ -383,17 +266,11 @@ const Login = ({ setIsAuthenticated }) => {
           <div className="text-center mt-8 text-xs text-slate-600">
             <p>
               By signing in, you agree to our{" "}
-              <Link
-                to="/terms"
-                className="text-blue-600 hover:underline font-semibold"
-              >
+              <Link to="/terms" className="text-blue-600 hover:underline font-semibold">
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link
-                to="/privacy"
-                className="text-blue-600 hover:underline font-semibold"
-              >
+              <Link to="/privacy" className="text-blue-600 hover:underline font-semibold">
                 Privacy Policy
               </Link>
             </p>
@@ -401,32 +278,14 @@ const Login = ({ setIsAuthenticated }) => {
         </div>
       </div>
 
-      {/* ✅ Extra legal / info section */}
+      {/* Footer Info */}
       <section className="text-center px-6 py-10 bg-gradient-to-br from-white via-blue-50 to-yellow-50">
         <p className="text-slate-700 text-sm md:text-base mb-4">
-          Investing through this platform is not covered by the Financial
-          Services Compensation Scheme (FSCS). Investing involves risk,
-          including loss of capital and illiquidity. It should only be done as
-          part of a diversified portfolio. Please read the full Risk Warning
-          before investing.
+          Investing involves risk, including loss of capital and illiquidity.
+          Please read the full Risk Warning before investing.
         </p>
-
-        <p className="text-slate-700 text-sm md:text-base mb-4">
-          <span className="text-blue-600">Crowd</span>
-          <span className="text-yellow-600">Bricks</span> does not make
-          investment recommendations. Always consult a qualified financial
-          advisor if unsure about any opportunity.
-        </p>
-
-        <p className="text-slate-700 text-sm md:text-base">
-          Investing and raising capital on{" "}
-          <span className="text-blue-600">Crowd</span>
-          <span className="text-yellow-600">Bricks</span> is subject to approval
-          and due diligence requirements.
-        </p>
-
         <p className="text-slate-600 text-xs md:text-sm mt-4 italic font-semibold">
-          For any issues with login or registration, contact{" "}
+          For login issues, contact{" "}
           <a
             href="mailto:support@crowdbricks.io"
             className="text-blue-600 font-medium hover:underline"

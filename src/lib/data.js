@@ -1,4 +1,4 @@
-// Dummy data for the Crowdbricks platform
+// Dummy data for the CrowdBricks platform — enriched with CrowdBricks culture & brand metadata
 import accraHeightsImage from "@/assets/accra-heights-complex.jpg";
 import kumasiPlazaImage from "@/assets/kumasi-commercial-plaza.jpg";
 import knustHousingImage from "@/assets/knust-student-housing.jpg";
@@ -10,17 +10,117 @@ import eastLegonOfficesImage from "@/assets/east-legon-offices.jpg";
 import asokwaResidencesImage from "@/assets/asokwa-residences.jpg";
 import axios from "axios";
 
+/*
+  CrowdBricks brand + culture metadata
+  - primary: brand blue (used for primary CTAs & headings)
+  - accent: warm yellow (used for highlights, badges)
+  - values: core platform culture points
+  - tagline, mission: shown across pages
+*/
+export const BRAND = {
+  name: "CrowdBricks",
+  primary: "#0ea5e9", // primary blue
+  accent: "#FBBF24", // yellow accent
+  neutral: {
+    bg: "#f8fafc",
+    card: "#ffffff",
+    muted: "#94a3b8",
+  },
+  tagline: "Community • Transparency • Impact",
+  mission:
+    "Open up property investment across Ghana — vetted projects, clear reporting and accessible minimums.",
+  values: ["Community", "Transparency", "Impact"],
+};
 
+/*
+  Small helpers used by UI:
+  - badgeForStatus(status): returns a small object with label + tailwind-like classes (UI components can convert)
+  - enrichProject(p): attach culture fields (impact, social, imageAlt) to a project object
+*/
+export const badgeForStatus = (status) => {
+  switch ((status || "").toLowerCase()) {
+    case "active":
+      return { label: "Funding Open", tone: "accent", className: "bg-yellow-100 text-yellow-800" };
+    case "funded":
+      return { label: "Fully Funded", tone: "primary", className: "bg-primary-50 text-primary-700" };
+    case "completed":
+      return { label: "Completed", tone: "neutral", className: "bg-slate-100 text-slate-700" };
+    default:
+      return { label: "Status", tone: "neutral", className: "bg-slate-100 text-slate-700" };
+  }
+};
+
+function enrichProject(project) {
+  if (!project) return project;
+  // accessibility: ensure alt text is present
+  const imageAlt = project.imageAlt || `${project.title} — ${project.location}`;
+
+  // cultural / impact metadata
+  const impactScore =
+    project.impactScore ??
+    Math.round(
+      // simple heuristic: higher yield + community jobs + sustainability = higher impact
+      Math.min(
+        100,
+        (project.expectedYield || 10) * 3 +
+          (project.communityJobs || (project.investors || 0) / 2) * 0.3 +
+          (project.sustainability ? 10 : 0)
+      )
+    );
+
+  const socialBenefit =
+    project.socialBenefit ||
+    (project.type === "student-housing"
+      ? "Supports student access to affordable, safe accommodation."
+      : project.type === "industrial"
+      ? "Creates logistics capacity and local jobs."
+      : "Delivers local jobs and improved housing / amenities.");
+
+  return {
+    ...project,
+    imageAlt,
+    brand: {
+      primary: BRAND.primary,
+      accent: BRAND.accent,
+      tagline: BRAND.tagline,
+    },
+    culture: {
+      mission: BRAND.mission,
+      values: BRAND.values,
+      communityMessage: `${BRAND.name} enables small investors to participate in local property development and capture value responsibly.`,
+    },
+    impact: {
+      score: impactScore,
+      communityJobs: project.communityJobs ?? Math.round((project.investors || 0) * 0.5),
+      sustainability: project.sustainability ?? false,
+      socialBenefit,
+    },
+    badge: badgeForStatus(project.fundingStatus ?? project.funding_status),
+  };
+}
+
+/*
+  fetchProjects: centralised API loader that returns enriched projects.
+  - returns an array (empty array on error)
+  - note: enrichment happens client-side so UI can consume brand/culture fields consistently
+*/
 export const fetchProjects = async () => {
   try {
-    const res = await axios.get("http://localhost:8000/api/projects");
-    return res.data;
+    const res = await axios.get("http://crowdbricks-backend.test/api/v1/projects");
+    const payload = res?.data?.data ?? res?.data ?? [];
+    if (!Array.isArray(payload)) return [];
+    return payload.map(enrichProject);
   } catch (err) {
     console.error("Failed to load projects:", err);
     return [];
   }
 };
-export const projects = [
+
+/*
+  Local dummy dataset (enriched) — kept for development when API is not available.
+  - Each item includes impact & culture fields via enrichProject
+*/
+const RAW_PROJECTS = [
   {
     id: "1",
     title: "Accra Heights Residential Complex",
@@ -52,6 +152,8 @@ export const projects = [
           "We've successfully completed the foundation work ahead of schedule. Construction is progressing smoothly.",
       },
     ],
+    communityJobs: 120,
+    sustainability: true,
   },
   {
     id: "2",
@@ -84,6 +186,8 @@ export const projects = [
           "We've successfully reached our funding target! Construction begins next month.",
       },
     ],
+    communityJobs: 90,
+    sustainability: false,
   },
   {
     id: "3",
@@ -116,6 +220,8 @@ export const projects = [
           "Land acquisition and documentation process has been completed successfully.",
       },
     ],
+    communityJobs: 40,
+    sustainability: true,
   },
   {
     id: "4",
@@ -148,6 +254,8 @@ export const projects = [
           "Site preparation and soil testing are complete. Construction begins next quarter.",
       },
     ],
+    communityJobs: 210,
+    sustainability: false,
   },
   {
     id: "5",
@@ -180,6 +288,8 @@ export const projects = [
           "Environmental and coastal impact assessments are completed and approved.",
       },
     ],
+    communityJobs: 75,
+    sustainability: true,
   },
   {
     id: "6",
@@ -212,6 +322,8 @@ export const projects = [
           "Design phase completed and approved by city planning authorities.",
       },
     ],
+    communityJobs: 50,
+    sustainability: false,
   },
   {
     id: "7",
@@ -244,6 +356,8 @@ export const projects = [
           "Groundbreaking ceremony held with local officials and investors present.",
       },
     ],
+    communityJobs: 160,
+    sustainability: true,
   },
   {
     id: "8",
@@ -276,6 +390,8 @@ export const projects = [
           "Initial site mapping and soil analysis complete. Construction scheduled to begin soon.",
       },
     ],
+    communityJobs: 95,
+    sustainability: false,
   },
   {
     id: "9",
@@ -308,14 +424,20 @@ export const projects = [
           "Partnership finalized with SunPower Ghana for full solar integration.",
       },
     ],
+    communityJobs: 45,
+    sustainability: true,
   },
 ];
+
+export const projects = RAW_PROJECTS.map(enrichProject);
 
 export const platformStats = {
   totalRaised: 12500000,
   totalInvestors: 1750,
   totalProjects: 37,
   averageReturn: 14.9,
+  // brand-aligned summary sentence to show on dashboards
+  summary: "CrowdBricks empowers everyday investors to participate in Ghanaian property developments with transparency and impact.",
 };
 
 export const portfolioData = [

@@ -101,7 +101,7 @@ const ProjectCard = ({ project, featured = false }) => {
 
       <CardFooter className="p-6 pt-0">
         <div className="w-full space-y-2">
-          <Link to={`/projects/${project.id}`} className="w-full">
+          <Link to={`/projects/${project.slug || project.id}`} className="w-full">
             <Button className="w-full" size="lg">
               View Details
             </Button>

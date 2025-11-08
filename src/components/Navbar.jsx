@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { Menu, X, User, Search as SearchIcon, ChevronDown } from "lucide-react";
+import { Menu, X, User, ChevronDown, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -9,357 +9,382 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { useToast } from "@/hooks/use-toast";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useAuth } from "@/context/AuthContext";
 
-/*
-  Navbar with "LEARN" dropdown
-  - Desktop: LEARN opens a dropdown containing help/faqs, statistics, tax overview, customer feedback,
-    free resources and blog.
-  - Mobile (Sheet): LEARN is rendered as an expandable section with the same links.
-  - Accessible: aria-haspopup / aria-expanded, closes on outside click or Escape.
-*/
-
-export const Navbar = ({ isAuthenticated, setIsAuthenticated }) => {
+export const Navbar = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, userType, token, logout } = useAuth();
+
   const [isOpen, setIsOpen] = useState(false);
-  const [openUserMenu, setOpenUserMenu] = useState(false);
-  const [query, setQuery] = useState("");
-  const userMenuRef = useRef(null);
-  const learnRef = useRef(null);
   const [learnOpen, setLearnOpen] = useState(false);
+  const [openUserMenu, setOpenUserMenu] = useState(false);
   const [mobileLearnOpen, setMobileLearnOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  const learnRef = useRef(null);
+  const userMenuRef = useRef(null);
+  const isAuthenticated = !!token;
 
   const isActive = (path) => location.pathname === path;
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    localStorage.removeItem("userType");
-    setIsAuthenticated(false);
-
+    logout();
     toast({
-      title: "Logout Successful 👋",
-      description: "You’ve been logged out successfully.",
+      title: "You’ve been logged out 👋",
+      description: "See you soon!",
     });
-
     navigate("/");
   };
 
   const navItems = [
-    { name: "HOME", path: "/" },
-    { name: "INVEST", path: "/projects" },
-    { name: "RAISE", path: "/raise" },
-    
-    // LEARN will be rendered as a dropdown
-    { name: "ABOUT", path: "/about" },
-    { name: "NEWS", path: "/news" },
-
+    { name: "Home", path: "/" },
+    { name: "Invest", path: "/projects" },
+    { name: "Raise", path: "/raise" },
+    { name: "News", path: "/news" },
   ];
 
-   const learnItems = [
-    { name: "HELP / FAQs", path: "/help" },
-    { name: "HOW IT WORKS", path: "/how-it-works" },
-    { name: "STATISTICS", path: "/statistics" },
-    { name: "TAX OVERVIEW", path: "/tax-overview" },
-    { name: "CUSTOMER FEEDBACK", path: "/feedback" },
-    { name: "TRAINING AND EVENT", path: "/training-and-event" },
-    { name: "FREE RESOURCE", path: "/resources" },
-    { name: "BLOG", path: "/news" },
+  const learnItems = [
+    { name: "Help / FAQs", path: "/help" },
+    { name: "How It Works", path: "/howitworks" },
+    { name: "Statistics", path: "/statistics" },
+    { name: "Tax Overview", path: "/taxoverview" },
+    { name: "Customer Feedback", path: "/testimonials" },
+    { name: "Training & Events", path: "/events" },
+    { name: "Free Resources", path: "/resources" },
+    { name: "Blog", path: "/news" },
   ];
- 
 
-  const user = (() => {
-    try {
-      return JSON.parse(localStorage.getItem("user"));
-    } catch {
-      return null;
-    }
-  })();
-
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((s) => s[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase()
+  const initials = user
+    ? `${user.first_name?.[0] || ""}${user.last_name?.[0] || ""}`.toUpperCase()
     : "U";
 
-  const onSearchSubmit = (e) => {
-    e.preventDefault();
-    if (!query.trim()) return;
-    navigate(`/projects?search=${encodeURIComponent(query.trim())}`);
-    setQuery("");
-  };
-
-  // close learn dropdown on outside click or Esc
+  // detect scroll position
   useEffect(() => {
-    function onOutside(e) {
-      if (learnRef.current && !learnRef.current.contains(e.target)) {
-        setLearnOpen(false);
-      }
-    }
-    function onKey(e) {
-      if (e.key === "Escape") {
-        setLearnOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", onOutside);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("mousedown", onOutside);
-      document.removeEventListener("keydown", onKey);
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // close dropdowns on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (learnRef.current && !learnRef.current.contains(e.target)) setLearnOpen(false);
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target))
+        setOpenUserMenu(false);
     };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
   }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-sm border-b border-slate-100 shadow-sm">
-      <div className="container mx-auto flex items-center justify-between h-16 px-4">
-        {/* Logo */}
+    <header
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ease-in-out border-b ${
+        scrolled
+          ? "bg-white/80 backdrop-blur-md border-blue-50 shadow-md"
+          : "bg-transparent border-transparent backdrop-blur-sm"
+      }`}
+    >
+      <div className="container mx-auto flex items-center justify-between h-16 px-4 transition-colors duration-700">
+        {/* ===== Logo ===== */}
         <Link
           to="/"
-          className="flex items-center gap-3 group cursor-pointer select-none"
+          className={`flex items-center gap-2 sm:gap-3 group transition-all duration-500 ${
+            scrolled ? "text-blue-700" : "text-white"
+          }`}
           aria-label="CrowdBricks home"
         >
-          <motion.img
-            src="/CB.png"
-            alt="CrowdBricks Logo"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.04 }}
-            transition={{ duration: 0.35, ease: "easeOut" }}
-            className="w-36 h-10 object-contain drop-shadow-sm"
-          />
-
-          <div className="hidden sm:flex flex-col leading-none">
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.12 }}
-              className="text-3xl md:text-4xl font-extrabold tracking-tight"
-            >
-              <span className="text-blue-600">Crowd</span>
-              <span className="text-yellow-400">Bricks</span>
-            </motion.span>
-            <motion.span
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.16 }}
-              className="text-xs text-slate-500"
-            >
-              Building Ghana For Better Tomorrow..
-            </motion.span>
-          </div>
+          <motion.span
+            className={`text-2xl sm:text-3xl font-extrabold tracking-tight ${
+              scrolled ? "text-blue-600" : "text-white"
+            }`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.15 }}
+          >
+            <span className={scrolled ? "text-blue-400" : "text-blue-600"}>Crowd</span><span className={scrolled ? "text-yellow-400" : "text-yellow-300"}>Bricks</span>
+          </motion.span>
         </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden lg:flex items-center space-x-6" aria-label="Primary">
+        {/* ===== Desktop Nav ===== */}
+        <nav
+          className={`hidden lg:flex items-center space-x-6 font-medium transition-colors duration-500 ${
+            scrolled ? "text-slate-700" : "text-white"
+          }`}
+        >
           {navItems.map((item) => (
             <Link
               key={item.name}
               to={item.path}
-              className={`text-sm font-medium transition-colors ${
+              className={`relative py-1 text-sm transition-colors ${
                 isActive(item.path)
-                  ? "text-primary-600 underline underline-offset-4 decoration-primary-200"
-                  : "text-slate-600 hover:text-primary-600"
+                  ? scrolled
+                    ? "text-blue-700 font-semibold"
+                    : "text-yellow-300 font-semibold"
+                  : scrolled
+                  ? "text-slate-600 hover:text-blue-700"
+                  : "text-white/80 hover:text-yellow-300"
               }`}
             >
               {item.name}
+              {isActive(item.path) && (
+                <motion.div
+                  layoutId="underline"
+                  className={`absolute bottom-0 left-0 right-0 h-[2px] rounded-full ${
+                    scrolled ? "bg-yellow-400" : "bg-white"
+                  }`}
+                />
+              )}
             </Link>
           ))}
 
-          {/* LEARN dropdown */}
+          {/* ===== Learn Dropdown ===== */}
           <div className="relative" ref={learnRef}>
             <button
               onClick={() => setLearnOpen((s) => !s)}
-              aria-haspopup="menu"
-              aria-expanded={learnOpen}
-              className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-primary-600 focus:outline-none"
+              className={`flex items-center gap-1 text-sm font-medium transition-colors ${
+                scrolled ? "text-slate-700 hover:text-blue-700" : "text-white hover:text-yellow-300"
+              }`}
             >
-              LEARN
-              <ChevronDown className="h-4 w-4" />
+              Learn
+              <ChevronDown
+                className={`h-4 w-4 transition-transform ${
+                  learnOpen ? "rotate-180" : ""
+                }`}
+              />
             </button>
 
-            {learnOpen && (
-              <div
-                role="menu"
-                aria-label="Learn menu"
-                className="absolute right-0 mt-2 w-56 bg-white border border-slate-100 rounded-md shadow-lg py-2 z-50"
-              >
-                {learnItems.map((li) => (
-                  <Link
-                    key={li.path}
-                    to={li.path}
-                    role="menuitem"
-                    onClick={() => setLearnOpen(false)}
-                    className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-                  >
-                    {li.name}
-                  </Link>
-                ))}
-              </div>
-            )}
+            <AnimatePresence>
+              {learnOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute right-0 mt-3 w-56 bg-white border border-blue-100 rounded-lg shadow-lg py-2"
+                >
+                  {learnItems.map((li) => (
+                    <Link
+                      key={li.path}
+                      to={li.path}
+                      onClick={() => setLearnOpen(false)}
+                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50"
+                    >
+                      {li.name}
+                    </Link>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </nav>
 
-        {/* Search (desktop) */}
-        <form
-          onSubmit={onSearchSubmit}
-          className="hidden md:flex items-center bg-slate-50 border border-slate-100 rounded-lg px-3 py-1"
-          role="search"
-          aria-label="Search projects"
-        >
-          <SearchIcon className="h-4 w-4 text-slate-400" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search projects..."
-            className="ml-2 w-48 bg-transparent text-sm outline-none placeholder:text-slate-400"
-            aria-label="Search projects"
-          />
-        </form>
-
-        {/* Desktop Auth / CTAs */}
-        <div className="hidden md:flex items-center space-x-3">
+        {/* ===== Auth / User Section ===== */}
+        <div className="hidden lg:flex items-center space-x-3 transition-all duration-500">
           {!isAuthenticated ? (
             <>
               <Link to="/auth/login">
-                <Button variant="ghost" className="text-slate-700">
-                  <User className="mr-2 h-4 w-4" />
-                  Login
+                <Button
+                  variant="ghost"
+                  className={`font-medium transition-all duration-300 ${
+                    scrolled
+                      ? "text-slate-700 hover:text-blue-700"
+                      : "text-white hover:text-yellow-300"
+                  }`}
+                >
+                  <User className="mr-2 h-4 w-4" /> Login
                 </Button>
               </Link>
               <Link to="/auth/register">
-                <Button className="bg-yellow-400 text-slate-900 hover:bg-yellow-500 border border-yellow-200 px-4">
+                <Button
+                  className={`transition-all duration-300 ${
+                    scrolled
+                      ? "bg-yellow-400 text-slate-900 hover:bg-yellow-500"
+                      : "bg-yellow-300 text-slate-900 hover:bg-yellow-400"
+                  }`}
+                >
                   Get Started
                 </Button>
               </Link>
             </>
           ) : (
-            <div className="relative">
+            <div className="relative" ref={userMenuRef}>
               <button
-                ref={userMenuRef}
                 onClick={() => setOpenUserMenu((s) => !s)}
-                className="inline-flex items-center gap-3 rounded-full px-3 py-1 bg-slate-50 border border-slate-100 hover:shadow-sm"
-                aria-haspopup="true"
-                aria-expanded={openUserMenu}
+                className={`flex items-center gap-3 px-3 py-1 rounded-full border transition-all duration-500 ${
+                  scrolled
+                    ? "bg-blue-50 border-blue-100 text-blue-700"
+                    : "bg-white/10 border-white/20 text-white hover:bg-white/20"
+                }`}
               >
-                <div className="w-8 h-8 rounded-full bg-primary-600 text-white flex items-center justify-center font-medium">
+                <div
+                  className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                    scrolled ? "bg-blue-600 text-white" : "bg-yellow-400 text-slate-900"
+                  }`}
+                >
                   {initials}
                 </div>
-                <div className="hidden sm:flex flex-col text-left leading-none">
-                  <span className="text-sm font-medium text-slate-800">
-                    {user?.name || "Investor"}
-                  </span>
-                  <span className="text-xs text-slate-500">Account</span>
-                </div>
-                <ChevronDown className="h-4 w-4 text-slate-500" />
+                <span className="hidden sm:block text-sm font-medium">
+                  {user?.first_name || "User"}
+                </span>
+                <ChevronDown
+                  className={`h-4 w-4 ${
+                    scrolled ? "text-slate-500" : "text-yellow-200"
+                  } transition-colors`}
+                />
               </button>
 
-              {openUserMenu && (
-                <div role="menu" className="absolute right-0 mt-2 w-44 bg-white border border-slate-100 rounded-md shadow-lg py-2">
-                  <Link to="/dashboard" onClick={() => setOpenUserMenu(false)} className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                    Dashboard
-                  </Link>
-                  <Link to="/profile" onClick={() => setOpenUserMenu(false)} className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50">
-                    Profile
-                  </Link>
-                  <button onClick={() => { handleLogout(); setOpenUserMenu(false); }} className="w-full text-left px-4 py-2 text-sm text-rose-600 hover:bg-rose-50">
-                    Logout
-                  </button>
-                </div>
-              )}
+              <AnimatePresence>
+                {openUserMenu && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -5 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute right-0 mt-2 w-48 bg-white border border-blue-100 rounded-md shadow-lg py-2"
+                  >
+                    {userType === "investor" && (
+                      <Link
+                        to="/dashboard/investor"
+                        className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50"
+                      >
+                        Investor Dashboard
+                      </Link>
+                    )}
+                    {userType === "developer" && (
+                      <Link
+                        to="/dashboard/developer"
+                        className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50"
+                      >
+                        Developer Dashboard
+                      </Link>
+                    )}
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-blue-50"
+                    >
+                      Profile
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center w-full px-4 py-2 text-sm text-rose-600 hover:bg-rose-50"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" /> Logout
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           )}
         </div>
 
-        {/* Mobile menu toggle */}
-        <div className="md:hidden flex items-center">
+        {/* ===== Mobile Menu ===== */}
+        <div className="lg:hidden">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" aria-label="Open menu">
-                {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <Button variant="ghost" size="icon" aria-label="Toggle menu">
+                {isOpen ? <X className="h-5 w-5" /> : <Menu className={`h-5 w-5 ${scrolled ? "text-blue-700" : "text-white"}`} />}
               </Button>
             </SheetTrigger>
 
-            <SheetContent side="right" className="w-[280px] sm:w-[340px]">
+            <SheetContent side="right" className="w-[280px] sm:w-[340px] bg-white/95 backdrop-blur-md">
               <SheetHeader>
-                <Link to="/" onClick={() => setIsOpen(false)} className="flex items-center gap-3">
-                  <img src="/CB.png" alt="CrowdBricks" className="w-28 h-8 object-contain" />
-                  <div className="text-sm font-semibold text-slate-700">CrowdBricks</div>
-                </Link>
+                <div className="flex items-center gap-3">
+                  <img src="/CB.png" alt="CrowdBricks" className="w-28 object-contain" />
+                  <span className="text-lg font-bold text-blue-600">
+                    Crowd<span className="text-yellow-400">Bricks</span>
+                  </span>
+                </div>
               </SheetHeader>
 
-              <div className="mt-4 space-y-3">
-                <form onSubmit={(e) => { e.preventDefault(); navigate(`/projects?search=${encodeURIComponent(query)}`); setIsOpen(false); }}>
-                  <div className="flex items-center gap-2">
-                    <input
-                      value={query}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search projects..."
-                      className="flex-1 px-3 py-2 rounded-lg border border-slate-100"
-                      aria-label="Search projects"
+              <div className="mt-6 space-y-3">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.name}
+                    to={item.path}
+                    onClick={() => setIsOpen(false)}
+                    className={`block py-2 px-3 rounded text-sm font-medium ${
+                      isActive(item.path)
+                        ? "text-blue-700 bg-blue-50"
+                        : "text-slate-700 hover:text-blue-700"
+                    }`}
+                  >
+                    {item.name}
+                  </Link>
+                ))}
+
+                {/* Mobile Learn */}
+                <div className="mt-4 border-t pt-3">
+                  <button
+                    onClick={() => setMobileLearnOpen((s) => !s)}
+                    className="w-full flex items-center justify-between text-sm font-medium text-slate-700"
+                  >
+                    Learn
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        mobileLearnOpen ? "rotate-180" : ""
+                      }`}
                     />
-                    <Button type="submit" variant="ghost" className="p-2">
-                      <SearchIcon className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </form>
-
-                <div className="flex flex-col mt-2">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.name}
-                      to={item.path}
-                      onClick={() => setIsOpen(false)}
-                      className={`py-2 px-2 rounded text-sm font-medium ${isActive(item.path) ? "text-primary-600" : "text-slate-700 hover:text-primary-600"}`}
-                    >
-                      {item.name}
-                    </Link>
-                  ))}
-
-                  {/* Mobile LEARN expandable */}
-                  <div className="mt-2 border-t pt-3">
-                    <button
-                      onClick={() => setMobileLearnOpen((s) => !s)}
-                      className="w-full flex items-center justify-between py-2 px-2 text-sm font-medium text-slate-700"
-                      aria-expanded={mobileLearnOpen}
-                      aria-controls="mobile-learn"
-                    >
-                      LEARN
-                      <ChevronDown className={`h-4 w-4 transition-transform ${mobileLearnOpen ? "rotate-180" : ""}`} />
-                    </button>
-
-                    <div id="mobile-learn" className={`${mobileLearnOpen ? "block" : "hidden"} mt-2 space-y-1`}>
+                  </button>
+                  {mobileLearnOpen && (
+                    <div className="mt-2 space-y-1">
                       {learnItems.map((li) => (
-                        <Link key={li.path} to={li.path} onClick={() => setIsOpen(false)} className="block py-2 px-3 rounded text-sm text-slate-700 hover:bg-slate-50">
+                        <Link
+                          key={li.path}
+                          to={li.path}
+                          onClick={() => setIsOpen(false)}
+                          className="block py-2 px-3 rounded text-sm text-slate-700 hover:bg-blue-50"
+                        >
                           {li.name}
                         </Link>
                       ))}
                     </div>
-                  </div>
+                  )}
                 </div>
 
-                <div className="border-t pt-4">
+                {/* Auth Buttons */}
+                <div className="mt-6 border-t pt-4">
                   {!isAuthenticated ? (
                     <>
                       <Link to="/auth/login" onClick={() => setIsOpen(false)}>
-                        <Button variant="ghost" className="w-full justify-start">
+                        <Button variant="outline" className="w-full justify-start">
                           <User className="mr-2 h-4 w-4" /> Login
                         </Button>
                       </Link>
                       <Link to="/auth/register" onClick={() => setIsOpen(false)}>
-                        <Button className="w-full mt-2 bg-yellow-400 text-slate-900">Get Started</Button>
+                        <Button className="w-full mt-2 bg-yellow-400 text-slate-900">
+                          Get Started
+                        </Button>
                       </Link>
                     </>
                   ) : (
                     <>
-                      <Link to="/dashboard" onClick={() => setIsOpen(false)}>
-                        <Button className="w-full justify-start">Dashboard</Button>
-                      </Link>
-                      <Button variant="destructive" className="w-full mt-2" onClick={() => { handleLogout(); setIsOpen(false); }}>
+                      {userType === "investor" && (
+                        <Link
+                          to="/dashboard/investor"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <Button className="w-full mt-2">Investor Dashboard</Button>
+                        </Link>
+                      )}
+                      {userType === "developer" && (
+                        <Link
+                          to="/dashboard/developer"
+                          onClick={() => setIsOpen(false)}
+                        >
+                          <Button className="w-full mt-2">Developer Dashboard</Button>
+                        </Link>
+                      )}
+                      <Button
+                        variant="destructive"
+                        className="w-full mt-2"
+                        onClick={() => {
+                          handleLogout();
+                          setIsOpen(false);
+                        }}
+                      >
                         Logout
                       </Button>
                     </>

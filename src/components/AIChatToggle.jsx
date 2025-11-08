@@ -14,10 +14,7 @@ export default function AIChatToggle() {
 
   return (
     <>
-      <div
-        aria-hidden={!open}
-        className={`fixed bottom-6 right-6 z-50 flex items-end justify-end`}
-      >
+      <div className={`fixed bottom-6 right-6 z-50 flex items-end justify-end`}>
         {/* If open, the chat widget will render above the button */}
         {open && <AIChatWidget onClose={() => setOpen(false)} />}
 
@@ -28,7 +25,7 @@ export default function AIChatToggle() {
         >
           {open ? <X className="h-5 w-5" /> : <MessageSquare className="h-5 w-5" />}
           <span className="hidden sm:inline text-sm font-medium">
-            {open ? "Close" : "Assistant"}
+            {open ? "Close" : "CrowdBot"}
           </span>
         </button>
       </div>

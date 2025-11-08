@@ -4,7 +4,7 @@ import MainLayout from "@/layouts/MainLayout";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { MessageCircle, Info, Clock, FileText, CheckCircle, Globe } from "lucide-react";
+import { MessageCircle, Info, Clock, FileText, CheckCircle, Globe, TrendingUp, Shield, Users, Zap, Target, ChevronRight, Sparkles, ArrowRight, Building2 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 export default function Raise() {
@@ -31,35 +31,25 @@ export default function Raise() {
       });
       return;
     }
-
     setLoading(true);
     try {
-      await axios.post(
-        "/api/raise-requests",
-        {
-          name: form.name,
-          company: form.company,
-          email: form.email,
-          phone: form.phone,
-          expected_amount: form.expectedAmount,
-          summary: form.summary,
-        },
-        { headers: { "Content-Type": "application/json" }, withCredentials: true }
-      );
-
+      await axios.post("/api/raise-request", form);
       toast({
-        title: "Request sent",
-        description: "We've received your request — our raise team will follow up within 48 hours.",
+        title: "Request Sent!",
+        description: "Our team will reach out to you shortly.",
       });
-
-      setForm({ name: "", company: "", email: "", phone: "", expectedAmount: "", summary: "" });
-    } catch (err) {
-      console.error(err);
+      setForm({
+        name: "",
+        company: "",
+        email: "",
+        phone: "",
+        expectedAmount: "",
+        summary: "",
+      });
+    } catch (error) {
       toast({
-        title: "Failed to submit",
-        description:
-          err?.response?.data?.message ||
-          "There was an error submitting your request. If the problem persists, email raise@crowdbricks.io",
+        title: "Request Failed",
+        description: error?.response?.data?.message || "An error occurred",
         variant: "destructive",
       });
     } finally {
@@ -67,149 +57,372 @@ export default function Raise() {
     }
   };
 
-  // ✅ Fixed: renamed and properly declared testimonials
   const testimonials = useMemo(
     () => [
       {
         quote:
-          "We raised the final tranche in under 6 weeks — CrowdBricks guided us at every step.",
-        name: "Francis O.",
-        role: "Developer",
-        image: "/avatar1.jpg",
+          "CrowdBricks helped us raise 2M for our residential project in just 6 weeks. The investor community is engaged, and the platform is transparent.",
+        name: "Ama Osei",
+        title: "CEO, Osei Developments",
+        image: "/placeholder.svg",
       },
       {
         quote:
-          "Great onboarding and investor reach — the platform is well structured.",
-        name: "Esi A.",
-        role: "Founder",
-        image: "/avatar2.jpg",
+          "Forget the bank. We raised half our capital here at flexible terms, and the team supported us every step of the way.",
+        name: "Kwame Adu",
+        title: "Director, Adu Real Estate",
+        image: "/placeholder.svg",
       },
       {
         quote:
-          "The process was seamless — they made raising capital simple and transparent.",
-        name: "Kwame B.",
-        role: "Real Estate Partner",
-        image: "/avatar3.jpg",
+          "The best crowdfunding platform in Ghana. Fast, professional, compliant. 100% recommended!",
+        name: "Efua Mensah",
+        title: "Founder, Mensah Properties",
+        image: "/placeholder.svg",
       },
     ],
     []
   );
 
-  // ✅ Added state for controlling which testimonial shows
   const [showTestimonial, setShowTestimonial] = useState(0);
-
-  // ✅ Auto-slide testimonials
   useEffect(() => {
     const interval = setInterval(() => {
-      setShowTestimonial((prev) => (prev + 1) % testimonials.length);
+      setShowTestimonial((s) => (s + 1) % testimonials.length);
     }, 6000);
     return () => clearInterval(interval);
   }, [testimonials.length]);
 
   return (
     <MainLayout>
-      <div className="container mx-auto w-full">
-        {/* ✅ HERO SECTION */}
+      <div className="min-h-screen bg-slate-900 relative overflow-hidden">
+        {/* Global fintech background */}
+        <div className="fixed inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-950 to-indigo-950"></div>
+          <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-blue-500/20 to-transparent rounded-full blur-3xl animate-blob"></div>
+          <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-gradient-to-br from-purple-500/20 to-transparent rounded-full blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute top-1/2 left-1/2 w-[500px] h-[500px] bg-gradient-to-br from-yellow-500/10 to-transparent rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+          {/* Tech grid pattern */}
+          <div className="absolute inset-0 opacity-[0.02]">
+            <div className="absolute inset-0" style={{ backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)', backgroundSize: '100px 100px' }} />
+          </div>
+        </div>
+
+        {/* ===== MODERN HERO SECTION ===== */}
         <section
           role="banner"
           aria-label="Hero — Raise Property Finance with CrowdBricks"
-          className="relative isolate overflow-hidden h-[60vh] flex items-end justify-center"
+          className="relative isolate overflow-hidden"
         >
+          {/* Floating particles for developers */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-yellow-400 rounded-full animate-ping opacity-20"></div>
+            <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full animate-ping opacity-30 animation-delay-2000"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-2 h-2 bg-purple-400 rounded-full animate-ping opacity-20 animation-delay-4000"></div>
+            <div className="absolute top-2/3 left-1/3 w-1 h-1 bg-cyan-400 rounded-full animate-ping opacity-25 animation-delay-3000"></div>
+          </div>
+
           <div className="absolute inset-0 -z-10 overflow-hidden">
             <picture>
               <source srcSet="/Hero5.jpg" type="image/webp" />
               <img
                 src="/Hero5.jpg"
                 alt="Aerial view of a real estate development project"
-                className="w-full h-full object-cover object-center"
+                className="w-full h-full object-cover object-center opacity-10"
                 loading="lazy"
               />
             </picture>
-            <div
-              aria-hidden="true"
-              className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"
-            />
           </div>
 
-          <div className="relative z-10 w-full text-center pb-16 px-4">
-            <h2 className="text-4xl sm:text-5xl font-extrabold text-white drop-shadow-lg">
-              Raising Property Finance With{" "}
-              <span className="text-blue-400">Crowd</span>
-              <span className="text-yellow-400">Bricks</span>
-            </h2>
-          </div>
-        </section>
-
-        {/* ✅ INTRO SECTION */}
-        <section className="py-16 text-center px-6">
-          <h2 className="text-2xl sm:text-3xl font-semibold text-slate-800">
-            Helping Developers Raise Finance and Build an Investor Community
-          </h2>
-          <p className="text-slate-700 mt-4 max-w-3xl mx-auto">
-            <span className="font-semibold text-blue-400">Crowd</span>
-            <span className="text-yellow-400">Bricks</span> offers full-stack property funding — from land uplift to multi-unit builds. Our team helps you structure campaigns, connect with investors, and manage your raise transparently.
-          </p>
-          <Link to="/auth/login">
-            <Button
-              size="lg"
-              className="mt-6 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-semibold shadow-md hover:shadow-lg transition-all duration-300"
+          <div className="relative z-10 container mx-auto px-6 py-24 md:py-32 text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
             >
-              Apply For Finance
-            </Button>
-          </Link>
+              <div className="inline-flex items-center gap-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 px-4 py-1.5 rounded-full text-sm font-bold mb-6">
+                <Sparkles className="w-3 h-3" />
+                For Developers & Property Owners
+              </div>
+            </motion.div>
+
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="text-5xl md:text-7xl font-black text-white mb-6 leading-tight"
+            >
+              Raise Property Finance
+              <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-500">
+                With CrowdBricks
+              </span>
+            </motion.h1>
+
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto mb-10 leading-relaxed"
+            >
+              Connect with thousands of investors ready to fund your next property project.
+              <span className="block mt-2 text-yellow-300 font-semibold">
+                Fast • Transparent • Regulated
+              </span>
+            </motion.p>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="flex flex-col sm:flex-row gap-4 justify-center"
+            >
+              <Link to="/auth/login">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-amber-600 text-slate-900 px-10 py-6 text-lg font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all hover:scale-105 rounded-xl group"
+                >
+                  Apply For Finance
+                  <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+              <Button
+                variant="outline"
+                size="lg"
+                className="bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 hover:bg-white hover:text-slate-900 px-10 py-6 text-lg font-semibold rounded-xl transition-all hover:scale-105"
+                onClick={() => document.getElementById('learn-more')?.scrollIntoView({ behavior: 'smooth' })}
+              >
+                Learn More
+              </Button>
+            </motion.div>
+
+            {/* Trust indicators */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="flex flex-wrap justify-center items-center gap-8 mt-12 text-white/80 text-sm"
+            >
+              <div className="flex items-center gap-2">
+                <Shield className="w-4 h-4 text-yellow-400" />
+                <span>SEC Regulated</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="w-4 h-4 text-yellow-400" />
+                <span>5,000+ Investors</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <TrendingUp className="w-4 h-4 text-yellow-400" />
+                <span>₵50M+ Raised</span>
+              </div>
+            </motion.div>
+          </div>
         </section>
 
-        {/* ✅ TWO-COLUMN SECTION */}
-        <section className="py-16 bg-gradient-to-br from-white via-blue-50 to-yellow-50">
+        {/* ===== WHY RAISE WITH US SECTION ===== */}
+        <section
+          id="learn-more"
+          className="container mx-auto px-6 py-20 relative z-10"
+          aria-labelledby="why-raise-heading"
+        >
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+            >
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-4">
+                Why Raise With{" "}
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-amber-500">
+                  CrowdBricks
+                </span>
+              </h2>
+              <p className="text-lg text-blue-200">
+                Access funding faster with our innovative platform and engaged investor community
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              {
+                icon: TrendingUp,
+                title: "Access to Capital",
+                description: "Connect with thousands of investors ready to fund property projects.",
+                gradient: "from-blue-500 to-cyan-500"
+              },
+              {
+                icon: Shield,
+                title: "SEC Regulated",
+                description: "Fully compliant with SEC Ghana 2024 Crowdfunding Guidelines.",
+                gradient: "from-purple-500 to-pink-500"
+              },
+              {
+                icon: Zap,
+                title: "Fast Onboarding",
+                description: "Complete KYC and project setup within days, not weeks.",
+                gradient: "from-yellow-500 to-orange-500"
+              },
+              {
+                icon: Target,
+                title: "Flexible Terms",
+                description: "Structure deals that work for your project and timeline.",
+                gradient: "from-green-500 to-emerald-500"
+              }
+            ].map((benefit, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="group relative bg-slate-800/40 backdrop-blur-md rounded-2xl shadow-2xl hover:shadow-yellow-500/20 transition-all duration-300 p-8 hover:-translate-y-2 border-2 border-white/10 hover:border-yellow-400/50"
+              >
+                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${benefit.gradient} flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform`}>
+                  <benefit.icon className="w-7 h-7 text-white" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-3">
+                  {benefit.title}
+                </h3>
+                <p className="text-blue-200 leading-relaxed">
+                  {benefit.description}
+                </p>
+              </motion.div>
+            ))}
+          </div>
+        </section>
+
+        {/* ===== REQUIREMENTS SECTION ===== */}
+        <section className="py-20 relative z-10">
           <div className="container mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
             {/* Left Column */}
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                Why Raise With{" "}
-                <span className="text-blue-600">Crowd</span>
-                <span className="text-yellow-500">Bricks</span>?
-              </h2>
-              <ul className="space-y-3 list-disc list-inside text-slate-700">
-                <li>
-                  <strong>Regulated by SEC Ghana:</strong> We follow SEC’s 2024 Crowdfunding Guidelines.
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-slate-800/40 backdrop-blur-md rounded-2xl shadow-2xl p-8 border-2 border-white/10"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                  <Building2 className="w-6 h-6 text-white" />
+                </div>
+                <h2 className="text-3xl font-black text-white">
+                  Platform Benefits
+                </h2>
+              </div>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500/20 to-cyan-500/20 border border-blue-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <Shield className="w-4 h-4 text-blue-300" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">
+                    <strong className="text-white">Regulated by SEC Ghana:</strong> We follow SEC's 2024 Crowdfunding Guidelines.
+                  </span>
                 </li>
-                <li>
-                  <strong>Bank of Ghana compliance:</strong> Fully compliant with BoG payment regulations.
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/20 to-green-500/20 border border-emerald-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <TrendingUp className="w-4 h-4 text-emerald-300" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">
+                    <strong className="text-white">Bank of Ghana compliance:</strong> Fully compliant with BoG payment regulations.
+                  </span>
                 </li>
-                <li>
-                  <strong>Fast onboarding:</strong> Complete your KYC and project setup within days.
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-yellow-500/20 to-amber-500/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <Zap className="w-4 h-4 text-yellow-300" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">
+                    <strong className="text-white">Fast onboarding:</strong> Complete your KYC and project setup within days.
+                  </span>
                 </li>
-                <li>
-                  <strong>Investor reach:</strong> Access thousands of verified investors.
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500/20 to-pink-500/20 border border-purple-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <Users className="w-4 h-4 text-purple-300" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">
+                    <strong className="text-white">Investor reach:</strong> Access thousands of verified investors.
+                  </span>
                 </li>
-                <li>
-                  <strong>Transparent process:</strong> Track everything from listing to payout.
-                </li>
-                <li>
-                  <strong>Expert support:</strong> Get guided by our dedicated property raise team.
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <Target className="w-4 h-4 text-cyan-300" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">
+                    <strong className="text-white">Transparent process:</strong> Track everything from listing to payout.
+                  </span>
                 </li>
               </ul>
-            </div>
+            </motion.div>
 
             {/* Right Column */}
-            <div>
-              <h2 className="text-3xl font-bold text-slate-900 mb-4">
-                What You’ll Need to Get Started
-              </h2>
-              <ul className="space-y-3 list-disc list-inside text-slate-700">
-                <li>Company registration & director IDs</li>
-                <li>Proof of property ownership or land title</li>
-                <li>Project plan with timeline & cost breakdown</li>
-                <li>Financial statements or prior project reports</li>
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6 }}
+              className="bg-slate-800/40 backdrop-blur-md rounded-2xl shadow-2xl p-8 border-2 border-white/10"
+            >
+              <div className="flex items-center gap-3 mb-6">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-500 flex items-center justify-center shadow-lg shadow-yellow-500/30">
+                  <CheckCircle className="w-6 h-6 text-slate-900" />
+                </div>
+                <h2 className="text-3xl font-bold text-white">
+                  What You'll Need
+                </h2>
+              </div>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <ChevronRight className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">Company registration & director IDs</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <ChevronRight className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">Proof of property ownership or land title</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <ChevronRight className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">Project plan with timeline & cost breakdown</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-lg bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0 mt-0.5 backdrop-blur-sm">
+                    <ChevronRight className="w-5 h-5 text-yellow-400" />
+                  </div>
+                  <span className="text-blue-200 leading-relaxed">Financial statements or prior project reports</span>
+                </li>
               </ul>
-            </div>
+              <div className="mt-8 pt-6 border-t-2 border-white/10">
+                <p className="text-sm text-blue-200 italic">
+                  <strong className="text-yellow-400">💡 Pro tip:</strong> Having these ready speeds up your approval process
+                </p>
+              </div>
+            </motion.div>
           </div>
         </section>
 
-        {/* ✅ TESTIMONIALS SECTION */}
-        <section className="relative isolate overflow-hidden bg-blue-600 px-6 py-24 sm:py-32 lg:px-8 h-[400px] flex items-center justify-center">
-          <div className="mx-auto max-w-2xl lg:max-w-4xl text-center">
-            <img src="/CB1.png" alt="CrowdBricks logo" className="mx-auto h-20 mb-10" />
+        {/* ===== TESTIMONIALS SECTION ===== */}
+        <section className="relative isolate overflow-hidden px-6 py-24 sm:py-32 lg:px-8 z-10">
+          {/* Floating particles */}
+          <div className="absolute inset-0 pointer-events-none">
+            <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-yellow-400 rounded-full animate-ping opacity-20"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-1 h-1 bg-blue-400 rounded-full animate-ping opacity-30 animation-delay-2000"></div>
+          </div>
+
+          <div className="relative z-10 mx-auto max-w-2xl lg:max-w-4xl text-center">
+            <motion.img 
+              initial={{ opacity: 0, scale: 0.9 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              src="/CB1.png" 
+              alt="CrowdBricks logo" 
+              className="mx-auto h-20 mb-10 filter drop-shadow-lg" 
+            />
 
             <AnimatePresence mode="wait">
               <motion.figure
@@ -220,63 +433,82 @@ export default function Raise() {
                 transition={{ duration: 0.6 }}
                 className="text-center"
               >
-                <blockquote className="text-xl sm:text-2xl font-semibold text-white">
-                  <p>“{testimonials[showTestimonial].quote}”</p>
+                <blockquote className="text-xl sm:text-2xl font-semibold text-white leading-relaxed">
+                  <p className="relative">
+                    <span className="text-yellow-400 text-6xl absolute -top-6 -left-4">"</span>
+                    {testimonials[showTestimonial].quote}
+                    <span className="text-yellow-400 text-6xl absolute -bottom-12 -right-4">"</span>
+                  </p>
                 </blockquote>
-                <figcaption className="mt-10">
+                <figcaption className="mt-14">
                   <img
                     src={testimonials[showTestimonial].image}
                     alt={testimonials[showTestimonial].name}
-                    className="mx-auto h-12 w-12 rounded-full object-cover border-2 border-yellow-400"
+                    className="mx-auto h-14 w-14 rounded-full object-cover border-2 border-yellow-400 shadow-lg"
                   />
                   <div className="mt-4 flex items-center justify-center space-x-3 text-base">
-                    <div className="font-semibold text-white">
+                    <div className="font-bold text-white text-lg">
                       {testimonials[showTestimonial].name}
                     </div>
-                    <svg
-                      viewBox="0 0 2 2"
-                      width="3"
-                      height="3"
-                      aria-hidden="true"
-                      className="fill-white"
-                    >
-                      <circle r="1" cx="1" cy="1" />
+                    <svg viewBox="0 0 2 2" width={3} height={3} aria-hidden="true" className="fill-yellow-400">
+                      <circle cx={1} cy={1} r={1} />
                     </svg>
-                    <div className="text-gray-300">
-                      {testimonials[showTestimonial].role}
-                    </div>
+                    <div className="text-blue-200">{testimonials[showTestimonial].title}</div>
                   </div>
                 </figcaption>
               </motion.figure>
             </AnimatePresence>
 
-            {/* Dot navigation */}
-            <div className="flex justify-center mt-10 space-x-3">
-              {testimonials.map((_, index) => (
+            {/* Pagination dots */}
+            <div className="flex justify-center gap-3 mt-12">
+              {testimonials.map((_, i) => (
                 <button
-                  key={index}
-                  onClick={() => setShowTestimonial(index)}
-                  aria-label={`Show testimonial ${index + 1}`}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    showTestimonial === index
-                      ? "bg-yellow-400 w-5"
-                      : "bg-gray-500 hover:bg-gray-400"
+                  key={i}
+                  onClick={() => setShowTestimonial(i)}
+                  className={`h-2.5 rounded-full transition-all duration-300 ${
+                    i === showTestimonial
+                      ? 'w-8 bg-yellow-400'
+                      : 'w-2.5 bg-white/40 hover:bg-white/60'
                   }`}
-                ></button>
+                  aria-label={`Show testimonial ${i + 1}`}
+                />
               ))}
             </div>
           </div>
         </section>
 
-        {/* ✅ CTA */}
-        <section className="my-10 text-center">
-          <h3 className="text-xl font-semibold mb-3">Ready to raise?</h3>
-          <p className="text-slate-600 mb-4">
-            Submit your request above or contact our raise team for a walkthrough.
-          </p>
-          <Button className="bg-blue-600 text-white px-6 py-3">
-            Start a Raise
-          </Button>
+        {/* ===== CTA SECTION ===== */}
+        <section className="container mx-auto px-6 py-20 text-center relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="max-w-4xl mx-auto bg-slate-800/40 backdrop-blur-md rounded-3xl shadow-2xl p-12 relative overflow-hidden border-2 border-white/10"
+          >
+            <div className="absolute -inset-0.5 bg-gradient-to-r from-yellow-400 via-blue-500 to-purple-500 rounded-3xl opacity-20 blur"></div>
+
+            <div className="relative z-10">
+              <div className="w-16 h-16 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-yellow-500/30">
+                <Sparkles className="w-8 h-8 text-slate-900" />
+              </div>
+              <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+                Ready to Raise Capital?
+              </h2>
+              <p className="text-xl text-blue-200 mb-10 leading-relaxed max-w-2xl mx-auto">
+                Join the leading property crowdfunding platform in Ghana. Submit your project today and get funded faster.
+              </p>
+              <Link to="/auth/login">
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-yellow-400 to-amber-500 hover:from-yellow-500 hover:to-amber-600 text-slate-900 px-12 py-7 text-xl font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all hover:scale-105 rounded-xl group"
+                >
+                  Start Your Application
+                  <ArrowRight className="ml-2 w-6 h-6 group-hover:translate-x-1 transition-transform" />
+                </Button>
+              </Link>
+            </div>
+          </motion.div>
         </section>
       </div>
     </MainLayout>

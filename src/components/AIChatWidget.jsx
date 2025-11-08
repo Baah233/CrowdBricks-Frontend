@@ -50,10 +50,22 @@ export default function AIChatWidget({ onClose }) {
       let replyText = "";
 
       if (aiUrl) {
+        // Get auth token from localStorage (matches api.js token key)
+        const token = localStorage.getItem("token");
+        
+        const headers = {
+          "Content-Type": "application/json",
+        };
+        
+        // Add authorization header if token exists
+        if (token) {
+          headers.Authorization = `Bearer ${token}`;
+        }
+
         const resp = await axios.post(
           aiUrl,
           { messages: [...messages, userMsg] },
-          { headers: { "Content-Type": "application/json" }, withCredentials: true }
+          { headers, withCredentials: true }
         );
         replyText = resp?.data?.reply || resp?.data?.message || "";
       } else {
