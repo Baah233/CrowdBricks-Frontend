@@ -120,38 +120,38 @@ export default function Events() {
       <AIChatToggle />
       <div className="min-h-screen bg-slate-950 overflow-hidden">
         {/* ANIMATED HERO - Orange/Amber Energy Theme */}
-        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
-          {/* Animated gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-orange-950 to-amber-950 animate-gradient" />
+        <section className="relative min-h-[400px] sm:min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
+          {/* Solid gradient background for better mobile performance */}
+          <div className="absolute inset-0 bg-gradient-to-br from-orange-900 via-orange-800 to-amber-900" />
           
-          {/* Animated orbs */}
+          {/* Animated orbs - smaller and less intense on mobile */}
           <motion.div 
-            className="absolute top-20 left-20 w-96 h-96 bg-orange-500/30 rounded-full blur-3xl"
+            className="absolute top-10 sm:top-20 left-10 sm:left-20 w-40 h-40 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-orange-500/20 sm:bg-orange-500/30 rounded-full blur-2xl sm:blur-3xl"
             animate={{
               scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
+              opacity: [0.2, 0.3, 0.2],
             }}
             transition={{ duration: 8, repeat: Infinity }}
           />
           <motion.div 
-            className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-amber-500/30 rounded-full blur-3xl"
+            className="absolute bottom-10 sm:bottom-20 right-10 sm:right-20 w-48 h-48 sm:w-80 sm:h-80 md:w-[500px] md:h-[500px] bg-amber-500/20 sm:bg-amber-500/30 rounded-full blur-2xl sm:blur-3xl"
             animate={{
               scale: [1.2, 1, 1.2],
-              opacity: [0.3, 0.5, 0.3],
+              opacity: [0.2, 0.3, 0.2],
             }}
             transition={{ duration: 10, repeat: Infinity, delay: 1 }}
           />
           <motion.div 
-            className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-yellow-500/20 rounded-full blur-3xl"
+            className="absolute top-1/2 left-1/2 w-32 h-32 sm:w-64 sm:h-64 md:w-[400px] md:h-[400px] bg-yellow-500/10 sm:bg-yellow-500/20 rounded-full blur-2xl sm:blur-3xl"
             animate={{
               scale: [1, 1.3, 1],
-              opacity: [0.2, 0.4, 0.2],
+              opacity: [0.1, 0.2, 0.1],
             }}
             transition={{ duration: 12, repeat: Infinity, delay: 2 }}
           />
 
-          {/* Tech grid pattern */}
-          <div className="absolute inset-0 opacity-20">
+          {/* Tech grid pattern - hidden on mobile */}
+          <div className="hidden sm:block absolute inset-0 opacity-10 sm:opacity-20">
             <div className="absolute inset-0" style={{
               backgroundImage: `linear-gradient(rgba(251, 146, 60, 0.2) 1px, transparent 1px),
                                linear-gradient(90deg, rgba(251, 146, 60, 0.2) 1px, transparent 1px)`,
@@ -159,9 +159,9 @@ export default function Events() {
             }} />
           </div>
 
-          {/* Floating shapes */}
+          {/* Floating shapes - hidden on mobile */}
           <motion.div
-            className="absolute top-32 right-1/4 w-2 h-2 bg-orange-400"
+            className="hidden sm:block absolute top-32 right-1/4 w-2 h-2 bg-orange-400"
             animate={{
               y: [0, -20, 0],
               opacity: [0.5, 1, 0.5],
@@ -169,7 +169,7 @@ export default function Events() {
             transition={{ duration: 4, repeat: Infinity }}
           />
           <motion.div
-            className="absolute bottom-40 left-1/4 w-3 h-3 bg-amber-400 rotate-45"
+            className="hidden sm:block absolute bottom-40 left-1/4 w-3 h-3 bg-amber-400 rotate-45"
             animate={{
               y: [0, 20, 0],
               rotate: [45, 90, 45],
@@ -178,20 +178,20 @@ export default function Events() {
           />
 
           {/* Content */}
-          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+          <div className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto py-12 sm:py-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <Badge className="mb-6 px-6 py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white border-none shadow-2xl">
-                <Calendar className="w-4 h-4 mr-2 inline" />
+              <Badge className="mb-4 sm:mb-6 px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-orange-600 to-amber-600 text-white border-none shadow-2xl text-xs sm:text-sm">
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-2 inline" />
                 EVENTS & TRAINING
               </Badge>
-              <h1 className="text-5xl md:text-7xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-orange-200 via-amber-200 to-yellow-200">
+              <h1 className="text-3xl sm:text-5xl md:text-7xl font-black mb-4 sm:mb-6 text-white">
                 Learn, Network, Grow
               </h1>
-              <p className="text-xl md:text-2xl text-orange-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-xl md:text-2xl text-orange-100 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
                 Join our community events, training sessions, and workshops to master real estate crowdfunding
               </p>
               

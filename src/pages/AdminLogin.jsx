@@ -11,6 +11,7 @@ import { useAuth } from "@/context/AuthContext";
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -69,7 +70,23 @@ export default function AdminLogin() {
           </div>
           <div>
             <Label htmlFor="password">Password</Label>
-            <Input className="text-slate-900 bg-white" id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+            <div className="relative">
+              <Input 
+                className="text-slate-900 bg-white pr-10" 
+                id="password" 
+                type={showPassword ? "text" : "password"} 
+                value={password} 
+                onChange={(e) => setPassword(e.target.value)} 
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-2xl hover:scale-110 transition-transform"
+                aria-label="Toggle password visibility"
+              >
+                {showPassword ? "👁️" : "👻"}
+              </button>
+            </div>
           </div>
           <Button onClick={handleAdminLogin} disabled={loading} className="w-full bg-blue-600 text-white">
             {loading ? "Signing in..." : "Login as Admin"}

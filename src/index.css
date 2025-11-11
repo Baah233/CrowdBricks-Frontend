@@ -1,5 +1,51 @@
 @import "tailwindcss";
 
+/* Mobile responsiveness fixes */
+html {
+  -webkit-text-size-adjust: 100%;
+  -moz-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+/* Ensure sections don't overflow on mobile */
+section {
+  overflow-x: hidden;
+}
+
+/* Fix hero height on mobile */
+@media (max-width: 640px) {
+  .min-h-screen {
+    min-height: -webkit-fill-available;
+    min-height: 100vh;
+  }
+  
+  /* Reduce blur effects on mobile for better performance */
+  .blur-3xl {
+    filter: blur(40px);
+  }
+  
+  .blur-2xl {
+    filter: blur(24px);
+  }
+  
+  /* Reduce backdrop-blur on mobile */
+  .backdrop-blur-sm {
+    backdrop-filter: blur(4px);
+  }
+  
+  .backdrop-blur-md {
+    backdrop-filter: blur(6px);
+  }
+  
+  /* Optimize animations on mobile */
+  .animate-blob {
+    animation: blob 10s infinite;
+  }
+}
 
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(20px); }

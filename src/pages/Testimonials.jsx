@@ -130,38 +130,38 @@ export default function Testimonials() {
       <AIChatToggle />
       <div className="min-h-screen bg-slate-950 overflow-hidden">
         {/* ANIMATED HERO - Purple/Pink Social Proof Theme */}
-        <section className="relative min-h-[600px] flex items-center justify-center overflow-hidden">
-          {/* Animated gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-purple-950 to-pink-950 animate-gradient" />
+        <section className="relative min-h-[400px] sm:min-h-[500px] md:min-h-[600px] flex items-center justify-center overflow-hidden">
+          {/* Solid gradient background for better mobile performance */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-900 via-purple-800 to-pink-900" />
           
-          {/* Animated orbs */}
+          {/* Animated orbs - smaller and less intense on mobile */}
           <motion.div 
-            className="absolute top-20 left-20 w-96 h-96 bg-purple-500/30 rounded-full blur-3xl"
+            className="absolute top-10 sm:top-20 left-10 sm:left-20 w-40 h-40 sm:w-64 sm:h-64 md:w-96 md:h-96 bg-purple-500/20 sm:bg-purple-500/30 rounded-full blur-2xl sm:blur-3xl"
             animate={{
               scale: [1, 1.2, 1],
-              opacity: [0.3, 0.5, 0.3],
+              opacity: [0.2, 0.3, 0.2],
             }}
             transition={{ duration: 8, repeat: Infinity }}
           />
           <motion.div 
-            className="absolute bottom-20 right-20 w-[500px] h-[500px] bg-pink-500/30 rounded-full blur-3xl"
+            className="absolute bottom-10 sm:bottom-20 right-10 sm:right-20 w-48 h-48 sm:w-80 sm:h-80 md:w-[500px] md:h-[500px] bg-pink-500/20 sm:bg-pink-500/30 rounded-full blur-2xl sm:blur-3xl"
             animate={{
               scale: [1.2, 1, 1.2],
-              opacity: [0.3, 0.5, 0.3],
+              opacity: [0.2, 0.3, 0.2],
             }}
             transition={{ duration: 10, repeat: Infinity, delay: 1 }}
           />
           <motion.div 
-            className="absolute top-1/2 left-1/2 w-[400px] h-[400px] bg-fuchsia-500/20 rounded-full blur-3xl"
+            className="absolute top-1/2 left-1/2 w-32 h-32 sm:w-64 sm:h-64 md:w-[400px] md:h-[400px] bg-fuchsia-500/10 sm:bg-fuchsia-500/20 rounded-full blur-2xl sm:blur-3xl"
             animate={{
               scale: [1, 1.3, 1],
-              opacity: [0.2, 0.4, 0.2],
+              opacity: [0.1, 0.2, 0.1],
             }}
             transition={{ duration: 12, repeat: Infinity, delay: 2 }}
           />
 
-          {/* Tech grid pattern */}
-          <div className="absolute inset-0 opacity-20">
+          {/* Tech grid pattern - hidden on mobile for better performance */}
+          <div className="hidden sm:block absolute inset-0 opacity-10 sm:opacity-20">
             <div className="absolute inset-0" style={{
               backgroundImage: `linear-gradient(rgba(168, 85, 247, 0.2) 1px, transparent 1px),
                                linear-gradient(90deg, rgba(168, 85, 247, 0.2) 1px, transparent 1px)`,
@@ -169,9 +169,9 @@ export default function Testimonials() {
             }} />
           </div>
 
-          {/* Floating shapes */}
+          {/* Floating shapes - hidden on mobile */}
           <motion.div
-            className="absolute top-32 right-1/4 w-2 h-2 bg-purple-400"
+            className="hidden sm:block absolute top-32 right-1/4 w-2 h-2 bg-purple-400"
             animate={{
               y: [0, -20, 0],
               opacity: [0.5, 1, 0.5],
@@ -179,7 +179,7 @@ export default function Testimonials() {
             transition={{ duration: 4, repeat: Infinity }}
           />
           <motion.div
-            className="absolute bottom-40 left-1/4 w-3 h-3 bg-pink-400 rotate-45"
+            className="hidden sm:block absolute bottom-40 left-1/4 w-3 h-3 bg-pink-400 rotate-45"
             animate={{
               y: [0, 20, 0],
               rotate: [45, 90, 45],
@@ -188,41 +188,41 @@ export default function Testimonials() {
           />
 
           {/* Content */}
-          <div className="relative z-10 text-center px-4 max-w-5xl mx-auto">
+          <div className="relative z-10 text-center px-4 sm:px-6 max-w-5xl mx-auto py-12 sm:py-16">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6 }}
             >
-              <Badge className="mb-6 px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none shadow-2xl">
-                <MessageSquare className="w-4 h-4 mr-2 inline" />
+              <Badge className="mb-4 sm:mb-6 px-4 sm:px-6 py-1.5 sm:py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white border-none shadow-2xl text-xs sm:text-sm">
+                <MessageSquare className="w-3 h-3 sm:w-4 sm:h-4 mr-2 inline" />
                 COMMUNITY VOICES
               </Badge>
-              <h1 className="text-5xl md:text-7xl font-black mb-6 text-transparent bg-clip-text bg-gradient-to-r from-purple-200 via-pink-200 to-fuchsia-200">
+              <h1 className="text-3xl sm:text-5xl md:text-7xl font-black mb-4 sm:mb-6 text-white">
                 Real Stories, Real Success
               </h1>
-              <p className="text-xl md:text-2xl text-purple-100 mb-8 max-w-3xl mx-auto leading-relaxed">
+              <p className="text-base sm:text-xl md:text-2xl text-purple-100 mb-6 sm:mb-8 max-w-3xl mx-auto leading-relaxed">
                 Discover how CrowdBricks is transforming dreams into reality for developers and investors across Ghana
               </p>
               
               {/* Trust indicators */}
               <motion.div 
-                className="flex flex-wrap justify-center gap-8 mt-12"
+                className="flex flex-wrap justify-center gap-4 sm:gap-8 mt-8 sm:mt-12"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
               >
-                <div className="flex items-center gap-2 text-purple-200">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold">4.9/5 Average Rating</span>
+                <div className="flex items-center gap-2 text-purple-200 text-sm sm:text-base">
+                  <Star className="w-4 h-4 sm:w-5 sm:h-5 fill-yellow-400 text-yellow-400" />
+                  <span className="font-semibold">4.9/5 Rating</span>
                 </div>
-                <div className="flex items-center gap-2 text-purple-200">
-                  <Users className="w-5 h-5" />
-                  <span className="font-semibold">3,200+ Happy Members</span>
+                <div className="flex items-center gap-2 text-purple-200 text-sm sm:text-base">
+                  <Users className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="font-semibold">3,200+ Members</span>
                 </div>
-                <div className="flex items-center gap-2 text-purple-200">
-                  <Award className="w-5 h-5" />
-                  <span className="font-semibold">500+ Success Stories</span>
+                <div className="flex items-center gap-2 text-purple-200 text-sm sm:text-base">
+                  <Award className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="font-semibold">500+ Stories</span>
                 </div>
               </motion.div>
             </motion.div>

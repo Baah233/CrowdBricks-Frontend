@@ -101,22 +101,22 @@ export default function Homepage() {
     <div className="min-h-screen bg-white text-slate-900 antialiased relative overflow-hidden">
       {/* ===== MODERN HERO SECTION ===== */}
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-800">
-        {/* Animated background pattern */}
-        <div className="absolute inset-0 opacity-10">
+        {/* Animated background pattern - lighter on mobile */}
+        <div className="absolute inset-0 opacity-5 sm:opacity-10">
           <div className="absolute inset-0" style={{
             backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
             backgroundSize: '40px 40px'
           }} />
         </div>
         
-        {/* Hero image with overlay */}
+        {/* Hero image with overlay - reduced on mobile */}
         {HERO_IMAGES.map((src, i) => (
           <img
             key={i}
             src={src}
             alt=""
-            className={`absolute inset-0 w-full h-screen object-cover transition-opacity duration-[2000ms] ${
-              i === heroIndex ? "opacity-20" : "opacity-0"
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[2000ms] ${
+              i === heroIndex ? "opacity-10 sm:opacity-20" : "opacity-0"
             }`}
           />
         ))}
@@ -124,18 +124,18 @@ export default function Homepage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-900/50 to-slate-900" />
         
         {/* Hero content */}
-        <div className="relative z-10 container mx-auto px-6 flex flex-col justify-center min-h-screen py-20">
+        <div className="relative z-10 container mx-auto px-4 sm:px-6 flex flex-col justify-center min-h-[500px] sm:min-h-[600px] md:min-h-screen py-12 sm:py-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="flex items-center gap-2 mb-6"
+            className="flex flex-wrap items-center gap-2 mb-4 sm:mb-6"
           >
-            <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 px-4 py-1.5 rounded-full text-sm font-semibold border-0 shadow-lg">
+            <Badge className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-slate-900 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold border-0 shadow-lg">
               <Sparkles className="w-3 h-3 mr-1 inline" />
               Trusted Real Estate Platform
             </Badge>
-            <Badge className="bg-white/10 backdrop-blur-sm text-white border-white/20 px-4 py-1.5 rounded-full text-sm">
+            <Badge className="bg-white/10 backdrop-blur-sm text-white border-white/20 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm">
               🇬🇭 Ghana
             </Badge>
           </motion.div>
@@ -144,14 +144,14 @@ export default function Homepage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-5xl md:text-7xl font-black leading-[1.1] text-white max-w-4xl mb-6"
+            className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] text-white max-w-4xl mb-4 sm:mb-6"
           >
             Invest in{" "}
             <span className="relative inline-block">
-              <span className="relative z-10 text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 via-yellow-400 to-amber-500">
+              <span className="relative z-10 text-white sm:text-transparent sm:bg-clip-text sm:bg-gradient-to-r sm:from-yellow-300 sm:via-yellow-400 sm:to-amber-500">
                 Real Estate
               </span>
-              <span className="absolute -bottom-2 left-0 w-full h-3 bg-yellow-400/30 blur-lg"></span>
+              <span className="hidden sm:block absolute -bottom-2 left-0 w-full h-3 bg-yellow-400/30 blur-lg"></span>
             </span>
             <br />
             Starting from{" "}
@@ -162,10 +162,10 @@ export default function Homepage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-xl md:text-2xl text-blue-100 max-w-2xl mb-8 leading-relaxed"
+            className="text-sm sm:text-xl md:text-2xl text-blue-100 max-w-2xl mb-6 sm:mb-8 leading-relaxed"
           >
             Join thousands of Ghanaians building wealth through fractional property ownership.
-            <span className="block mt-2 text-yellow-300 font-semibold">
+            <span className="block mt-2 text-yellow-300 font-semibold text-xs sm:text-base">
               Transparent • Regulated • Accessible
             </span>
           </motion.p>
@@ -174,18 +174,18 @@ export default function Homepage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="flex flex-col sm:flex-row gap-4 mb-12"
+            className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-8 sm:mb-12"
           >
-            <Link to="/projects">
-              <Button className="bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-slate-900 px-8 py-6 text-lg font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all hover:scale-105 rounded-xl group">
+            <Link to="/projects" className="w-full sm:w-auto">
+              <Button className="w-full sm:w-auto bg-gradient-to-r from-yellow-400 to-yellow-500 hover:from-yellow-500 hover:to-yellow-600 text-slate-900 px-6 sm:px-8 py-3 sm:py-6 text-sm sm:text-lg font-bold shadow-2xl hover:shadow-yellow-500/50 transition-all hover:scale-105 rounded-xl group">
                 Explore Investments
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 w-3 h-3 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link to="/auth/register">
+            <Link to="/auth/register" className="w-full sm:w-auto">
               <Button
                 variant="outline"
-                className="bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 hover:bg-white hover:text-slate-900 px-8 py-6 text-lg font-semibold rounded-xl transition-all hover:scale-105"
+                className="w-full sm:w-auto bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 hover:bg-white hover:text-slate-900 px-6 sm:px-8 py-3 sm:py-6 text-sm sm:text-lg font-semibold rounded-xl transition-all hover:scale-105"
               >
                 Create Free Account
               </Button>
@@ -197,25 +197,25 @@ export default function Homepage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="flex flex-wrap items-center gap-6 text-white/80 text-sm"
+            className="flex flex-wrap items-center gap-4 sm:gap-6 text-white/80 text-xs sm:text-sm"
           >
-            <div className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-yellow-400" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Shield className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" />
               <span>SEC Regulated</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Lock className="w-4 h-4 text-yellow-400" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Lock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" />
               <span>Secure Platform</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-yellow-400" />
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-400" />
               <span>{platformStats.totalInvestors.toLocaleString()}+ Investors</span>
             </div>
           </motion.div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
+        {/* Scroll indicator - hidden on mobile */}
+        <div className="hidden sm:block absolute bottom-8 left-1/2 -translate-x-1/2 z-20 animate-bounce">
           <div className="w-6 h-10 rounded-full border-2 border-white/30 flex items-start justify-center p-2">
             <div className="w-1.5 h-3 bg-white/60 rounded-full"></div>
           </div>
@@ -228,26 +228,26 @@ export default function Homepage() {
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
-        className="py-20 bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden"
+        className="py-12 sm:py-20 bg-gradient-to-br from-slate-50 via-white to-blue-50 relative overflow-hidden"
       >
-        {/* Animated background elements */}
-        <div className="absolute inset-0 opacity-30">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
-          <div className="absolute top-40 right-10 w-72 h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
-          <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+        {/* Animated background elements - smaller on mobile */}
+        <div className="absolute inset-0 opacity-20 sm:opacity-30">
+          <div className="absolute top-20 left-10 w-40 sm:w-72 h-40 sm:h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-2xl sm:blur-3xl animate-blob"></div>
+          <div className="absolute top-40 right-10 w-40 sm:w-72 h-40 sm:h-72 bg-yellow-200 rounded-full mix-blend-multiply filter blur-2xl sm:blur-3xl animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-20 left-1/2 w-40 sm:w-72 h-40 sm:h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-2xl sm:blur-3xl animate-blob animation-delay-4000"></div>
         </div>
         
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.02]">
+        {/* Grid pattern overlay - hidden on mobile */}
+        <div className="hidden sm:block absolute inset-0 opacity-[0.02]">
           <div className="absolute inset-0" style={{
             backgroundImage: `linear-gradient(to right, rgb(0, 0, 0) 1px, transparent 1px), linear-gradient(to bottom, rgb(0, 0, 0) 1px, transparent 1px)`,
             backgroundSize: '60px 60px'
           }} />
         </div>
         
-        <div className="container mx-auto px-6 text-center relative z-10">
-          <h2 className="text-4xl font-bold text-slate-900 mb-4">Property Investment Made Simple</h2>
-          <h4 className="text-lg md:text-xl text-slate-600 mb-6">
+        <div className="container mx-auto px-4 sm:px-6 text-center relative z-10">
+          <h2 className="text-2xl sm:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">Property Investment Made Simple</h2>
+          <h4 className="text-base sm:text-lg md:text-xl text-slate-600 mb-4 sm:mb-6">
             Build Wealth Online |{" "}
             <span className="text-yellow-400">Capital Growth & Income</span> |{" "}
             <span className="text-blue-600">Global Investor Community</span>
@@ -258,17 +258,17 @@ export default function Homepage() {
             investment accessible to everyone while empowering developers to deliver sustainable real
             estate projects across Ghana.
           </p>
-          <p className="text-lg text-slate-600 leading-relaxed">
-            Since launching in 2023, we’ve built expertise in property funding, sharing our insights
+          <p className="text-sm sm:text-lg text-slate-600 leading-relaxed">
+            Since launching in 2023, we've built expertise in property funding, sharing our insights
             with both investors and developers.{" "}
             <span className="font-semibold text-slate-800">
               Flexibility, transparency, and integrity
             </span>{" "}
             are at the heart of all we do.
           </p>
-          <div className="mt-10">
+          <div className="mt-6 sm:mt-10">
             <Link to="/auth/register">
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-lg px-8 py-4 font-semibold rounded-full shadow-md hover:shadow-lg transition-all">
+              <Button className="bg-blue-600 hover:bg-blue-700 text-white text-sm sm:text-lg px-6 sm:px-8 py-3 sm:py-4 font-semibold rounded-full shadow-md hover:shadow-lg transition-all w-full sm:w-auto">
                 Start Investing Today
               </Button>
             </Link>
@@ -282,19 +282,19 @@ export default function Homepage() {
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className="py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden"
+        className="py-12 sm:py-20 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden"
       >
         {/* Dynamic mesh gradient background */}
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-500/20 via-transparent to-transparent"></div>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,_var(--tw-gradient-stops))] from-purple-500/20 via-transparent to-transparent"></div>
         
-        {/* Animated gradient orbs */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-yellow-400/20 rounded-full blur-3xl animate-blob"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl animate-blob animation-delay-2000"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl animate-blob animation-delay-4000"></div>
+        {/* Animated gradient orbs - smaller on mobile */}
+        <div className="absolute top-0 right-0 w-40 sm:w-96 h-40 sm:h-96 bg-yellow-400/20 rounded-full blur-2xl sm:blur-3xl animate-blob"></div>
+        <div className="absolute bottom-0 left-0 w-40 sm:w-96 h-40 sm:h-96 bg-blue-400/20 rounded-full blur-2xl sm:blur-3xl animate-blob animation-delay-2000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-40 sm:w-96 h-40 sm:h-96 bg-purple-400/20 rounded-full blur-2xl sm:blur-3xl animate-blob animation-delay-4000"></div>
         
-        {/* Tech grid overlay */}
-        <div className="absolute inset-0 opacity-[0.02]">
+        {/* Tech grid overlay - hidden on mobile */}
+        <div className="hidden sm:block absolute inset-0 opacity-[0.02]">
           <div className="absolute inset-0" style={{
             backgroundImage: `
               linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
@@ -309,16 +309,16 @@ export default function Homepage() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-16"
+            className="text-center mb-8 sm:mb-16"
           >
-            <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-4 py-1.5 rounded-full text-sm font-semibold mb-4 shadow-lg shadow-blue-500/50">
+            <Badge className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white px-3 sm:px-4 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4 shadow-lg shadow-blue-500/50">
               <BarChart3 className="w-3 h-3 mr-1 inline" />
               Platform Performance
             </Badge>
-            <h2 className="text-4xl md:text-5xl font-black text-white mb-4 bg-clip-text">
+            <h2 className="text-2xl sm:text-4xl md:text-5xl font-black text-white mb-2 sm:mb-4 bg-clip-text">
               Proven Track Record
             </h2>
-            <p className="text-xl text-blue-200 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-xl text-blue-200 max-w-2xl mx-auto">
               Numbers that speak to our commitment to investor success
             </p>
           </motion.div>
